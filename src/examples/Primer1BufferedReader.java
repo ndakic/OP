@@ -1,4 +1,4 @@
-package CSV.examples;
+package examples;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -9,7 +9,7 @@ public class Primer1BufferedReader {
 	public static void main(String[] args) {
 		
 		
-		String csvFilename = "src/CSV/files/drzave_gradovi.csv";
+		String csvFilename = "src/files/drzave_gradovi.csv";
 		BufferedReader fileReader = null;
 		
 		final String DELIMITER = ",";

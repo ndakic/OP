@@ -1,4 +1,4 @@
-package CSV.examples;
+package examples;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,7 +12,7 @@ public class Primer2CsvWritterAll {
 	public static void main(String[] args) throws Exception {
 		
 		
-		String csv = "src/CSV/files/drzave_gradovi2.csv";
+		String csv = "src/files/drzave_gradovi2.csv";
 		CSVWriter writer = new CSVWriter(new FileWriter(csv));
 
 		List<String[]> data = new ArrayList<String[]>();

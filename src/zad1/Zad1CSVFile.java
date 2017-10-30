@@ -1,4 +1,4 @@
-package CSV.zad1;
+package zad1;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -16,7 +16,7 @@ public class Zad1CSVFile {
 
 	public static void main(String[] args) throws Exception {
 		
-		String file = "src/CSV/files/points.csv";
+		String file = "src/files/points.csv";
 		CSVReader csvReader = new CSVReader(new FileReader(file),',','\'', 1);
 		
 		
@@ -53,7 +53,7 @@ public class Zad1CSVFile {
 			redovi.add(red);
 		}
 		
-		String outputFile = "src/CSV/files/pointsOutput.csv";
+		String outputFile = "src/files/pointsOutput.csv";
 		CSVWriter csvWriter = new CSVWriter(new FileWriter(outputFile), '#', CSVWriter.NO_QUOTE_CHARACTER);
 		csvWriter.writeAll(redovi); // cuvanje
 		

@@ -1,4 +1,4 @@
-package CSV.examples;
+package examples;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,7 +9,7 @@ public class Primer2CsvWritterNext {
 
 	public static void main(String[] args) throws Exception {
 		
-		String csv = "src/CSV/files/drzave_gradovi3.csv";
+		String csv = "src/files/drzave_gradovi3.csv";
 		CSVWriter writer = new CSVWriter(new FileWriter(csv));
 
 		String [] country = "Australia,Canberra".split(",");

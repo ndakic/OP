@@ -1,4 +1,4 @@
-package CSV.examples;
+package examples;
 
 public class Country {
 

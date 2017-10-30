@@ -1,4 +1,4 @@
-package CSV.zad1;
+package zad1;
 
 public class Point implements Comparable<Point> {
 	

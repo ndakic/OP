@@ -1,4 +1,4 @@
-package CSV.zad2;
+package zad2;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -17,7 +17,7 @@ public class Ocene {
 
 	public static void main(String[] args) throws Exception {
 		
-		String filePath = "src/CSV/files/studenti.csv";
+		String filePath = "src/files/studenti.csv";
 		CSVReader csvReader = new CSVReader(new FileReader(filePath), ',', '\'', 1);
 		
 		ColumnPositionMappingStrategy strat = new ColumnPositionMappingStrategy();
@@ -94,7 +94,7 @@ public class Ocene {
 	
 public static void saveData(List<String []> data, String fileName) throws Exception {
 		
-		String file = "src/CSV/files/"+ fileName + ".csv";
+		String file = "src/files/"+ fileName + ".csv";
 		CSVWriter csvWriter = new CSVWriter(new FileWriter(file), ',', CSVWriter.NO_QUOTE_CHARACTER);
 		
 		csvWriter.writeAll(data);

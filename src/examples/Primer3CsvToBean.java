@@ -1,4 +1,4 @@
-package CSV.examples;
+package examples;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class Primer3CsvToBean {
 		bean-ova i ispisati nazive glavnih gradova.
 		*/
 		
-		String csvFilename = "src/CSV/files/drzave_gradovi.csv";
+		String csvFilename = "src/files/drzave_gradovi.csv";
 		CSVReader csvReader = new CSVReader(new FileReader(csvFilename));
 		
 		ColumnPositionMappingStrategy strat = new ColumnPositionMappingStrategy();

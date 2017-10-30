@@ -1,4 +1,4 @@
-package CSV.zad2;
+package zad2;
 
 public class Student {
 

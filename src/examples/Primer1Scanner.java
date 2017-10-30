@@ -1,4 +1,4 @@
-package CSV.examples;
+package examples;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,7 +9,7 @@ public class Primer1Scanner {
 	public static void main(String[] args) throws Exception {
 		
 		
-		Scanner scanner = new Scanner(new File("src/CSV/files/drzave_gradovi.csv"));
+		Scanner scanner = new Scanner(new File("src/files/drzave_gradovi.csv"));
 
 		scanner.useDelimiter(",");
 

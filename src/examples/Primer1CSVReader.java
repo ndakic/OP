@@ -1,4 +1,4 @@
-package CSV.examples;
+package examples;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -9,7 +9,7 @@ public class Primer1CSVReader {
 
 	public static void main(String[] args) throws Exception {
 		
-		String csvFilename = "src/CSV/files/drzave_gradovi.csv";
+		String csvFilename = "src/files/drzave_gradovi.csv";
 		CSVReader csvReader = new CSVReader(new FileReader(csvFilename));
 		String[] row = null;
 
