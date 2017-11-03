@@ -45,6 +45,7 @@ public class Zad1CSVFile {
 		Collections.sort(points);
 		
 		
+		
 		// pravljenje redova za cuvanje u datoteku
 		List<String[]> redovi = new ArrayList();
 		
