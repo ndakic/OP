@@ -9,6 +9,7 @@ public class Book {
 	private int Edition;
 	private String Title;
 	private Author Author;
+	
 	public String getISBN() {
 		return ISBN;
 	}
