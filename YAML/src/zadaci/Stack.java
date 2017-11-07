@@ -4,12 +4,12 @@ public class Stack {
 	
 	private String file;
 	private int line;
-	private Code code;
+	private String code;
 	
 	public Stack() {
 		super();
 	}
-	public Stack(String file, int line, Code code) {
+	public Stack(String file, int line, String code) {
 		super();
 		this.file = file;
 		this.line = line;
@@ -27,10 +27,10 @@ public class Stack {
 	public void setLine(int line) {
 		this.line = line;
 	}
-	public Code getCode() {
+	public String getCode() {
 		return code;
 	}
-	public void setCode(Code code) {
+	public void setCode(String code) {
 		this.code = code;
 	}
 	@Override

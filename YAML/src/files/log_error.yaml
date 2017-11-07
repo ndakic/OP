@@ -1,0 +1,12 @@
+- !!zadaci.Log
+  date: '1006545797000'
+  fatal: Unknown variable "bar"
+  stack:
+  - code: |
+      x = MoreObject("345\n")
+    file: TopClass.py
+    line: 23
+  - code: foo = bar
+    file: MoreClass.py
+    line: 58
+  user: ed

@@ -1,0 +1,8 @@
+- !!zadaci.Log
+  time: '1006545702000'
+  user: ed
+  warning: This is an error message for the log file
+- !!zadaci.Log
+  time: '1006545751000'
+  user: ed
+  warning: A slightly different error message.
