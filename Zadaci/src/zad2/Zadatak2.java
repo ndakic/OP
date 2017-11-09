@@ -23,7 +23,7 @@ import zad1.Zadatak1;
 
 public class Zadatak2 {
 	
-	private static List<Podatak> podaci;
+	public static List<Podatak> podaci;
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException {
@@ -50,36 +50,7 @@ public class Zadatak2 {
 		
 		saveToYAML(podaciYAML, "podaci");
 		
-			
-		Set<String> setSa = new HashSet<String>();
-		Set<String> setBez = new HashSet<String>();
 		
-		List<Podatak> saPovratkom = new ArrayList<>();
-		List<Podatak> bezPovratka = new ArrayList<>();
-		
-		for(Podatak pod: podaci) {
-			Podatak podatak = obezPovratak(pod.getMestoPolaska(), pod.getMestoDolaska());
-			
-			if(podatak != null) {
-				setSa.add(podatak.getSifraRelacije());
-			}else {
-				setBez.add(pod.getSifraRelacije());
-			}
-				
-		}
-		
-		for(String s: setSa) {
-			Podatak pod = getPodatak(s);
-			saPovratkom.add(pod);
-		}
-		
-		for(String b: setBez) {
-			Podatak pod = getPodatak(b);
-			bezPovratka.add(pod);
-		}
-		
-		saveToYAML(saPovratkom, "relacijeSaPovratkom");
-		saveToYAML(bezPovratka, "relacijeBezPovratka");
 					
 	}
 	
@@ -207,18 +178,7 @@ public class Zadatak2 {
 	    }
 	};
 	
-	public static Podatak obezPovratak(String pol, String dol) {
-		
-		Podatak pod = null;
-	
-		for(Podatak podatak: podaci) {
-			if(podatak.getMestoPolaska().equalsIgnoreCase(dol) && podatak.getMestoDolaska().equalsIgnoreCase(pol)) {
-				pod = podatak;
-			}
-		}
-			
-		return pod;
-	}
+
 	
 	
 
