@@ -1,0 +1,70 @@
+- !!zad1.Podatak
+  brProdKarata: 10
+  cenaKarte: 550
+  datumPolaska: 01.01.2017.
+  mestoDolaska: Beograd
+  mestoPolaska: Novi Sad
+  peronPolaska: '1'
+  planiranoVremeDolaska: '17:00'
+  sifraRelacije: '1'
+  vremePolaska: '15:00'
+- !!zad1.Podatak
+  brProdKarata: 10
+  cenaKarte: 700
+  datumPolaska: 11.01.2017.
+  mestoDolaska: Subotica
+  mestoPolaska: Novi Sad
+  peronPolaska: '4'
+  planiranoVremeDolaska: '16:00'
+  sifraRelacije: '2'
+  vremePolaska: '14:00'
+- !!zad1.Podatak
+  brProdKarata: 4
+  cenaKarte: 200
+  datumPolaska: 12.01.2017.
+  mestoDolaska: Uzice
+  mestoPolaska: Novi Sad
+  peronPolaska: '6'
+  planiranoVremeDolaska: '18:00'
+  sifraRelacije: '3'
+  vremePolaska: '16:00'
+- !!zad1.Podatak
+  brProdKarata: 3
+  cenaKarte: 650
+  datumPolaska: 04.01.2017.
+  mestoDolaska: Valjevo
+  mestoPolaska: Novi Sad
+  peronPolaska: '5'
+  planiranoVremeDolaska: '19:00'
+  sifraRelacije: '4'
+  vremePolaska: '18:00'
+- !!zad1.Podatak
+  brProdKarata: 18
+  cenaKarte: 500
+  datumPolaska: 16.01.2017.
+  mestoDolaska: Vranje
+  mestoPolaska: Novi Sad
+  peronPolaska: '4'
+  planiranoVremeDolaska: '17:00'
+  sifraRelacije: '5'
+  vremePolaska: '16:00'
+- !!zad1.Podatak
+  brProdKarata: 18
+  cenaKarte: 500
+  datumPolaska: 16.01.2017.
+  mestoDolaska: Nis
+  mestoPolaska: Novi Sad
+  peronPolaska: '3'
+  planiranoVremeDolaska: '18:00'
+  sifraRelacije: '8'
+  vremePolaska: '16:00'
+- !!zad1.Podatak
+  brProdKarata: 18
+  cenaKarte: 500
+  datumPolaska: 16.01.2017.
+  mestoDolaska: Becej
+  mestoPolaska: Novi Sad
+  peronPolaska: '3'
+  planiranoVremeDolaska: '19:00'
+  sifraRelacije: '9'
+  vremePolaska: '16:00'

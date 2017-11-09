@@ -1,0 +1,31 @@
+- !!zad1.Podatak
+  brProdKarata: 9
+  brRelacija: 7
+  cenaKarte: 500
+  datumPolaska: 17.01.2017.
+  mestoDolaska: Novi Sad
+  mestoPolaska: Zrenjanin
+  peronPolaska: '4'
+  planiranoVremeDolaska: 08:00
+  sifraRelacije: '6'
+  vremePolaska: 07:30
+- !!zad1.Podatak
+  brProdKarata: 9
+  cenaKarte: 500
+  datumPolaska: 16.01.2017.
+  mestoDolaska: Zrenjanin
+  mestoPolaska: Novi Sad
+  peronPolaska: '4'
+  planiranoVremeDolaska: '23:00'
+  sifraRelacije: '6'
+  vremePolaska: '17:30'
+- !!zad1.Podatak
+  brProdKarata: 40
+  cenaKarte: 500
+  datumPolaska: 01.01.2017.
+  mestoDolaska: Beograd
+  mestoPolaska: Novi Sad
+  peronPolaska: '1'
+  planiranoVremeDolaska: '12:00'
+  sifraRelacije: '1'
+  vremePolaska: '11:00'

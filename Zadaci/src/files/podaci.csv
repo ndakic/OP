@@ -1,17 +1,20 @@
 sifraRelacije,mestoPolaska,mestoDolaska,datumPolaska,vremePolaska,planiranoVremeDolaska,peronPolaska,cenaKarte,brProdKarata,brRelacija
-1,Novi Sad,Beograd,01.01.2017.,11:00,12:00,1,500,10,0
+1,Novi Sad,Beograd,01.01.2017.,11:00,12:00,1,500,40,0
 2,Novi Sad,Subotica,11.01.2017.,14:00,16:00,4,700,10,0
 3,Novi Sad,Uzice,12.01.2017.,16:00,18:00,6,200,4,0
 4,Novi Sad,Valjevo,04.01.2017.,18:00,19:00,5,650,3,0
 5,Novi Sad,Vranje,16.01.2017.,16:00,17:00,4,500,18,0
-6,Novi Sad,Zrenjenin,16.01.2017.,16:00,17:00,3,500,18,0
+6,Novi Sad,Zrenjanin,16.01.2017.,16:00,17:00,3,500,18,0
 7,Novi Sad,Sombor,16.01.2017.,16:00,17:00,5,500,18,0
 8,Novi Sad,Nis,16.01.2017.,16:00,18:00,3,500,18,0
 9,Novi Sad,Becej,16.01.2017.,16:00,19:00,3,500,18,0
-10,Novi Sad,Beograd,16.01.2017.,16:00,20:00,4,500,18,0
+1,Novi Sad,Beograd,16.01.2017.,16:00,20:00,4,500,18,0
 1,Novi Sad,Beograd,01.01.2017.,15:00,19:00,2,510,10,0
 1,Novi Sad,Beograd,01.01.2017.,15:00,17:00,1,550,10,0
-6,Novi Sad,Zrenjenin,16.01.2017.,17:00,20:00,3,500,8,0
-6,Novi Sad,Zrenjenin,16.01.2017.,17:30,23:00,4,500,9,0
-6,Novi Sad,Zrenjenin,16.01.2017.,19:00,22:00,6,540,8,0
-6,Novi Sad,Zrenjenin,16.01.2017.,20:00,21:00,3,590,19,0
+6,Novi Sad,Zrenjanin,16.01.2017.,17:00,20:00,3,500,8,0
+6,Novi Sad,Zrenjanin,16.01.2017.,17:30,23:00,4,500,9,0
+6,Novi Sad,Zrenjanin,16.01.2017.,19:00,22:00,6,540,8,0
+6,Novi Sad,Zrenjanin,16.01.2017.,20:00,21:00,3,590,19,0
+6,Zrenjanin,Novi Sad,17.01.2017.,10:00,12:00,3,500,8,0
+6,Zrenjanin,Novi Sad,17.01.2017.,07:30,08:00,4,500,9,0
+7,Sombor,Novi Sad,17.01.2017.,08:00,09:00,5,500,8,0
