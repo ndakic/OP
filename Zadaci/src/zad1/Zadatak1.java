@@ -27,26 +27,26 @@ public class Zadatak1 {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static List<Podatak> createCSV(String fileName) throws IOException {
 		
-		Podatak podatak1 = new Podatak("1", "Novi Sad", "Beograd", "01.01.2017.", "11:00", "12:00", "1", 500, 40, 0);
-		Podatak podatak2 = new Podatak("2", "Novi Sad", "Subotica", "11.01.2017.", "14:00", "16:00", "4", 700, 10, 0);
-		Podatak podatak3 = new Podatak("3", "Novi Sad", "Uzice", "12.01.2017.", "16:00", "18:00", "6", 200, 4, 0);
-		Podatak podatak4 = new Podatak("4", "Novi Sad", "Valjevo", "04.01.2017.", "18:00", "19:00", "5", 650, 3, 0);
-		Podatak podatak5 = new Podatak("5", "Novi Sad", "Vranje", "16.01.2017.", "16:00", "17:00", "4", 500, 18, 0);
-		Podatak podatak6 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "16:00", "17:00", "3", 500, 18, 0);
-		Podatak podatak7 = new Podatak("7", "Novi Sad", "Sombor", "16.01.2017.", "16:00", "17:00", "5", 500, 18, 0);
-		Podatak podatak8 = new Podatak("8", "Novi Sad", "Nis", "16.01.2017.", "16:00", "18:00", "3", 500, 18, 0);
-		Podatak podatak9 = new Podatak("9", "Novi Sad", "Becej", "16.01.2017.", "16:00", "19:00", "3", 500, 18, 0);
-		Podatak podatak10 = new Podatak("1", "Novi Sad", "Beograd", "16.01.2017.", "16:00", "20:00", "4", 500, 18, 0);
-		Podatak podatak11 = new Podatak("1", "Novi Sad", "Beograd", "01.01.2017.", "15:00", "19:00", "2", 510, 10, 0);
-		Podatak podatak12 = new Podatak("1", "Novi Sad", "Beograd", "01.01.2017.", "15:00", "17:00", "1", 550, 10, 0);
-		Podatak podatak13 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "17:00", "20:00", "3", 500, 8, 0);
-		Podatak podatak14 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "17:30", "23:00", "4", 500, 9, 0);
-		Podatak podatak15 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "19:00", "22:00", "6", 540, 8, 0);
-		Podatak podatak16 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "20:00", "21:00", "3", 590, 19, 0);
+		Podatak podatak1 = new Podatak("1", "Novi Sad", "Beograd", "01.01.2017.", "11:00", "12:00", "1", "500", "40", "0");
+		Podatak podatak2 = new Podatak("2", "Novi Sad", "Subotica", "11.01.2017.", "14:00", "16:00", "4", "700", "10", "0");
+		Podatak podatak3 = new Podatak("3", "Novi Sad", "Uzice", "12.01.2017.", "16:00", "18:00", "6", "200", "4", "0");
+		Podatak podatak4 = new Podatak("4", "Novi Sad", "Valjevo", "04.01.2017.", "18:00", "19:00", "5", "650", "3", "0");
+		Podatak podatak5 = new Podatak("5", "Novi Sad", "Vranje", "16.01.2017.", "16:00", "17:00", "4", "500", "18", "0");
+		Podatak podatak6 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "16:00", "17:00", "3", "500", "18", "0");
+		Podatak podatak7 = new Podatak("7", "Novi Sad", "Sombor", "16.01.2017.", "16:00", "17:00", "5", "500", "18","0");
+		Podatak podatak8 = new Podatak("8", "Novi Sad", "Nis", "16.01.2017.", "16:00", "18:00", "3", "500", "18", "0");
+		Podatak podatak9 = new Podatak("9", "Novi Sad", "Becej", "16.01.2017.", "16:00", "19:00", "3", "500", "18", "0");
+		Podatak podatak10 = new Podatak("1", "Novi Sad", "Beograd", "16.01.2017.", "16:00", "20:00", "4", "500", "18", "0");
+		Podatak podatak11 = new Podatak("1", "Novi Sad", "Beograd", "01.01.2017.", "15:00", "19:00", "2", "510", "10", "0");
+		Podatak podatak12 = new Podatak("1", "Novi Sad", "Beograd", "01.01.2017.", "15:00", "17:00", "1", "550", "10", "0");
+		Podatak podatak13 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "17:00", "20:00", "3", "500", "8", "0");
+		Podatak podatak14 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "17:30", "23:00", "4", "500", "9", "0");
+		Podatak podatak15 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "19:00", "22:00", "6", "540", "8", "0");
+		Podatak podatak16 = new Podatak("6", "Novi Sad", "Zrenjanin", "16.01.2017.", "20:00", "21:00", "3", "590", "19", "0");
 		
-		Podatak podatak17 = new Podatak("6", "Zrenjanin", "Novi Sad", "17.01.2017.", "10:00", "12:00", "3", 500, 8, 0);
-		Podatak podatak18 = new Podatak("6", "Zrenjanin", "Novi Sad", "17.01.2017.", "07:30", "08:00", "4", 500, 9, 0);
-		Podatak podatak19 = new Podatak("7", "Sombor", "Novi Sad", "17.01.2017.", "08:00", "09:00", "5", 500, 8, 0);
+		Podatak podatak17 = new Podatak("6", "Zrenjanin", "Novi Sad", "17.01.2017.", "10:00", "12:00", "3", "500", "8", "0");
+		Podatak podatak18 = new Podatak("6", "Zrenjanin", "Novi Sad", "17.01.2017.", "07:30", "08:00", "4", "500", "9", "0");
+		Podatak podatak19 = new Podatak("7", "Sombor", "Novi Sad", "17.01.2017.", "08:00", "09:00", "5", "500", "8", "0");
 		
 		List<Podatak> podaci = new ArrayList();
 		
@@ -102,7 +102,7 @@ public class Zadatak1 {
 			Relacija relacija = new Relacija(podatak.getSifraRelacije(), podatak.getMestoPolaska(), podatak.getMestoDolaska());
 			
 			Polazak polazak = new Polazak(podatak.getSifraRelacije(), podatak.getDatumPolaska(), podatak.getVremePolaska(), 
-					podatak.getPlaniranoVremeDolaska(), podatak.getPeronPolaska(), podatak.getCenaKarte(), podatak.getBrProdKarata());
+					podatak.getPlaniranoVremeDolaska(), podatak.getPeronPolaska(), Integer.parseInt(podatak.getCenaKarte()), Integer.parseInt(podatak.getBrProdKarata()));
 			
 			
 			relacije.add(relacija);

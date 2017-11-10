@@ -82,7 +82,7 @@ public class Zadatak2 {
 		Podatak podatak = getPodatak(sifra);
 		
 		if(max != 0)
-			podatak.setBrRelacija(max);
+			podatak.setBrRelacija(Integer.toString(max));
 		
 		return podatak;
 				
@@ -136,7 +136,7 @@ public class Zadatak2 {
 		int naj = 0;
 		
 		for(Podatak pod: podaci) {
-			int zarada = pod.getCenaKarte() * pod.getBrProdKarata();
+			int zarada = Integer.parseInt(pod.getCenaKarte()) * Integer.parseInt(pod.getBrProdKarata());
 			
 			if(zarada > naj) {
 				naj = zarada;

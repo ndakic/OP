@@ -1,6 +1,7 @@
 - !!zad1.Podatak
-  brProdKarata: 9
-  cenaKarte: 500
+  brProdKarata: '9'
+  brRelacija: '0'
+  cenaKarte: '500'
   datumPolaska: 17.01.2017.
   mestoDolaska: Novi Sad
   mestoPolaska: Zrenjanin
@@ -9,8 +10,9 @@
   sifraRelacije: '6'
   vremePolaska: 07:30
 - !!zad1.Podatak
-  brProdKarata: 8
-  cenaKarte: 500
+  brProdKarata: '8'
+  brRelacija: '0'
+  cenaKarte: '500'
   datumPolaska: 17.01.2017.
   mestoDolaska: Novi Sad
   mestoPolaska: Sombor

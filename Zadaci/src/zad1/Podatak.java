@@ -1,6 +1,6 @@
 package zad1;
 
-public class Podatak {
+public class Podatak implements Comparable<Podatak>{
 	
 	private String sifraRelacije;
 	private String mestoPolaska;
@@ -9,18 +9,17 @@ public class Podatak {
 	private String vremePolaska;
 	private String planiranoVremeDolaska;
 	private String peronPolaska;
-	private int cenaKarte;
-	private int brProdKarata;
-	
-	private int brRelacija;
+	private String cenaKarte;
+	private String brProdKarata;
+	private String brRelacija;
 
 	public Podatak() {
 		super();
 	}
 
 	public Podatak(String sifraRelacije, String mestoPolaska, String mestoDolaska, String datumPolaska,
-			String vremePolaska, String planiranoVremeDolaska, String peronPolaska, int cenaKarte, int brProdKarata,
-			int brRelacija) {
+			String vremePolaska, String planiranoVremeDolaska, String peronPolaska, String cenaKarte, String brProdKarata,
+			String brRelacija) {
 		super();
 		this.sifraRelacije = sifraRelacije;
 		this.mestoPolaska = mestoPolaska;
@@ -90,27 +89,27 @@ public class Podatak {
 		this.peronPolaska = peronPolaska;
 	}
 
-	public int getCenaKarte() {
+	public String getCenaKarte() {
 		return cenaKarte;
 	}
 
-	public void setCenaKarte(int cenaKarte) {
+	public void setCenaKarte(String cenaKarte) {
 		this.cenaKarte = cenaKarte;
 	}
 
-	public int getBrProdKarata() {
+	public String getBrProdKarata() {
 		return brProdKarata;
 	}
 
-	public void setBrProdKarata(int brProdKarata) {
+	public void setBrProdKarata(String brProdKarata) {
 		this.brProdKarata = brProdKarata;
 	}
 
-	public int getBrRelacija() {
+	public String getBrRelacija() {
 		return brRelacija;
 	}
 
-	public void setBrRelacija(int brRelacija) {
+	public void setBrRelacija(String brRelacija) {
 		this.brRelacija = brRelacija;
 	}
 
@@ -121,6 +120,62 @@ public class Podatak {
 				+ ", planiranoVremeDolaska=" + planiranoVremeDolaska + ", peronPolaska=" + peronPolaska + ", cenaKarte="
 				+ cenaKarte + ", brProdKarata=" + brProdKarata + ", brRelacija=" + brRelacija + "]";
 	}
+	
+	@Override
+	public int compareTo(Podatak p) {
+		
+		int status = 0;
+		
+		if(p.getSifraRelacije() != null)
+			status += this.sifraRelacije.compareTo(p.getSifraRelacije());
+		
+		if(p.getMestoPolaska() != null)
+			status += this.mestoPolaska.compareTo(p.getMestoPolaska());
+		
+		if(p.getMestoDolaska() != null)
+			status += this.mestoDolaska.compareTo(p.getMestoDolaska());
+		
+		if(p.getDatumPolaska() != null)
+			status += this.datumPolaska.compareTo(p.getDatumPolaska());
+		
+		if(p.getVremePolaska() != null)
+			status += this.vremePolaska.compareTo(p.getVremePolaska());
+		
+		if(p.getPlaniranoVremeDolaska() != null)
+			status += this.planiranoVremeDolaska.compareTo(p.getPlaniranoVremeDolaska());
+		
+		if(p.getPeronPolaska() != null)
+			status += this.peronPolaska.compareTo(p.getPeronPolaska());
+		
+		if(p.getCenaKarte() != null) {
+			if(Integer.parseInt(this.cenaKarte) == Integer.parseInt(p.getCenaKarte())){
+				status += 0; // u sustini nepotrebno 
+			}else {
+				status += 99;
+			}
+		}
+		
+		if(p.getBrProdKarata() != null) {
+			if(Integer.parseInt(this.brProdKarata) == Integer.parseInt(p.getBrProdKarata())){
+				status += 0; // u sustini nepotrebno 
+			}else {
+				status += 99;
+			}
+		}
+		
+		if(p.getBrRelacija() != null) {
+			if(Integer.parseInt(this.brRelacija) == Integer.parseInt(p.getBrRelacija())){
+				status += 0; // u sustini nepotrebno 
+			}else {
+				status += 99;
+			}
+		}
+		
+		
+		return status;
+		
+
+}
 	
 	
 	

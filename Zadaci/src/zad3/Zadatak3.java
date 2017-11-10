@@ -1,10 +1,16 @@
 package zad3;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import zad1.Podatak;
 import zad1.Zadatak1;
@@ -14,7 +20,7 @@ public class Zadatak3 {
 	
 	public static List<Podatak> podaci;
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		
 		podaci = Zadatak1.createCSV("podaci");
 		
@@ -45,7 +51,7 @@ public class Zadatak3 {
 		}
 		
 		Zadatak2.saveToYAML(saPovratkom, "relacijeSaPovratkom");
-		Zadatak2.saveToYAML(bezPovratka, "relacijeBezPovratka");
+		saveToJSON(bezPovratka, "relacijeBezPovratka");
 
 	}
 	
@@ -73,6 +79,13 @@ public class Zadatak3 {
 		}
 		
 		return podatak;
+		
+	}
+	
+	public static void saveToJSON(List<Podatak> podaci, String fileName) throws Exception, JsonProcessingException, Exception {
+		
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.writeValue(new File("src/files/" + fileName + ".json"), podaci);
 		
 	}
 
