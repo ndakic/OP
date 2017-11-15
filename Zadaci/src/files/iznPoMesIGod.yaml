@@ -1,0 +1,36 @@
+- !!zad5.Rent
+  brojIznDana: '21'
+  cenaIznNaDan: '10000'
+  datumIzn: 11.10.2017.
+  datumVrac: 31.10.2017.
+  mestoIzn: Novi Sad
+  osoba:
+    ime: Nikola
+    maticniBroj: '1'
+    prezime: Lazic
+  predjenoKm: '1000'
+  sifraIzn: '1'
+- !!zad5.Rent
+  brojIznDana: '18'
+  cenaIznNaDan: '10000'
+  datumIzn: 14.10.2017.
+  datumVrac: 31.10.2017.
+  mestoIzn: Beograd
+  osoba:
+    ime: Milos
+    maticniBroj: '2'
+    prezime: Teodosic
+  predjenoKm: '1200'
+  sifraIzn: '2'
+- !!zad5.Rent
+  brojIznDana: '14'
+  cenaIznNaDan: '10000'
+  datumIzn: 18.10.2017.
+  datumVrac: 31.10.2017.
+  mestoIzn: Beograd
+  osoba:
+    ime: Nikola
+    maticniBroj: '4'
+    prezime: Jokic
+  predjenoKm: '1050'
+  sifraIzn: '4'
