@@ -1,0 +1,119 @@
+- !!zad6Kol1.Projekcija
+  datum: 20.11.2017.
+  film: Matilda
+  nazivSale: Velika Sala
+  sifraSale: '1'
+  trajanje: '110'
+  vreme: '21:00'
+- !!zad6Kol1.Projekcija
+  datum: 21.11.2017.
+  film: Cetvrti covek
+  nazivSale: Mala Sala
+  sifraSale: '2'
+  trajanje: '100'
+  vreme: '21:00'
+- !!zad6Kol1.Projekcija
+  datum: 21.11.2017.
+  film: Lepa sela lepo gore
+  nazivSale: Velika Sala
+  sifraSale: '3'
+  trajanje: '120'
+  vreme: '18:00'
+- !!zad6Kol1.Projekcija
+  datum: 23.11.2017.
+  film: Klopka
+  nazivSale: Elite Sala
+  sifraSale: '4'
+  trajanje: '130'
+  vreme: '21:00'
+- !!zad6Kol1.Projekcija
+  datum: 24.11.2017.
+  film: Nebeska udica
+  nazivSale: Mala Sala
+  sifraSale: '5'
+  trajanje: '105'
+  vreme: '21:00'
+- !!zad6Kol1.Projekcija
+  datum: 25.11.2017.
+  film: Munje
+  nazivSale: Velika Sala
+  sifraSale: '6'
+  trajanje: '110'
+  vreme: '21:00'
+- !!zad6Kol1.Projekcija
+  datum: 26.11.2017.
+  film: Kad porastem bicu kengur
+  nazivSale: Mala Sala
+  sifraSale: '7'
+  trajanje: '115'
+  vreme: '19:00'
+- !!zad6Kol1.Projekcija
+  datum: 24.11.2017.
+  film: Hobbit
+  nazivSale: Elite Sala
+  sifraSale: '5'
+  trajanje: '110'
+  vreme: '12:00'
+- !!zad6Kol1.Projekcija
+  datum: 22.11.2017.
+  film: Ko to tamo peva
+  nazivSale: Velika Sala
+  sifraSale: '3'
+  trajanje: '130'
+  vreme: '10:00'
+- !!zad6Kol1.Projekcija
+  datum: 21.11.2017.
+  film: Ubistvo u Orijent Ekspresu
+  nazivSale: Mala Sala
+  sifraSale: '2'
+  trajanje: '90'
+  vreme: '16:00'
+- !!zad6Kol1.Projekcija
+  datum: 23.11.2017.
+  film: Balkanski spijun
+  nazivSale: Velika Sala
+  sifraSale: '4'
+  trajanje: '95'
+  vreme: '16:00'
+- !!zad6Kol1.Projekcija
+  datum: 26.11.2017.
+  film: Varljivo leto 68
+  nazivSale: Elite Sala
+  sifraSale: '7'
+  trajanje: '110'
+  vreme: '22:00'
+- !!zad6Kol1.Projekcija
+  datum: 20.11.2017.
+  film: Matilda2
+  nazivSale: Velika Sala
+  sifraSale: '1'
+  trajanje: '120'
+  vreme: '14:00'
+- !!zad6Kol1.Projekcija
+  datum: 21.11.2017.
+  film: Matilda3
+  nazivSale: Velika Sala
+  sifraSale: '1'
+  trajanje: '125'
+  vreme: '15:00'
+- !!zad6Kol1.Projekcija
+  datum: 22.11.2017.
+  film: Lepa sela lepo gore
+  nazivSale: Velika Sala
+  sifraSale: '3'
+  trajanje: '90'
+  vreme: '10:00'
+- !!zad6Kol1.Projekcija
+  datum: 22.11.2017.
+  film: Lepa sela lepo gore
+  nazivSale: Velika Sala
+  sifraSale: '3'
+  trajanje: '70'
+  vreme: '14:00'
+- !!zad6Kol1.Projekcija
+  datum: 22.11.2017.
+  film: Lepa sela lepo gore
+  nazivSale: Velika Sala
+  sifraSale: '3'
+  trajanje: '125'
+  vreme: '22:00'
