@@ -1,4 +1,4 @@
-package zad6Kol1;
+package zad6;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package zad6Kol1;
+package zad6;
 
 public class Izvestaj implements Comparable<Izvestaj>{
 	
