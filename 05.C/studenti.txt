@@ -1,0 +1,4 @@
+index, ime, ocena
+SW59/2013, OP, 8
+SW59/2013, Statistika, 8
+SW59/2013, Diskretna, 7
