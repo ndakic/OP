@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1514408324 source:/home/daka/WorkspaceCB/DinStrukPod/main.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
