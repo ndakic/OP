@@ -185,6 +185,68 @@ void prebrojReci(char *nazivFajla){
 }
 
 
+void kreiranjeBinarneDatoteke(){
+
+    FILE *f;
+
+    char nazivDatoteke[20];
+
+    printf("Unesite naziv datotele: ");
+    scanf("%s", nazivDatoteke);
+
+    f= fopen(nazivDatoteke, "ab+");
+
+    int n, i;
+
+    printf("Unesite ukupan broj brojeva: ");
+    scanf("%d", &n);
+
+    int niz[n];
+
+    for(i=0; i < n; i++){
+        printf("niz[%d]=",i);
+        scanf("%d", &niz[i]);
+    }
+
+    fwrite(niz, sizeof(int), n, f);
+
+
+    fclose(f);
+}
+
+void citanjeSadrzajaBinarneDatoteke(){
+
+    FILE *file;
+
+    char nazivDatoteke[20];
+
+    printf("Unesite naziv datotele: ");
+    scanf("%s", nazivDatoteke);
+
+    file = fopen(nazivDatoteke, "rb");
+
+    if(file == NULL){
+        printf("Ne postoji takva datoteka!\n");
+        return;
+    }
+
+    int b[20];
+    int n;
+
+    printf("\nUcitaj ukupno n brojeva: ");
+    scanf("%d", &n);
+
+    fread(b, sizeof(int), n, file);
+
+    int i;;
+
+    for(i=0; i < n; i++){
+        printf("%d\n", b[i]);
+    }
+
+}
+
+
 int main()
 {
 
@@ -197,6 +259,8 @@ int main()
         printf("\t 3 - Dinamisko prosirivanje niza\n ");
         printf("\t 4 - Ucitavanje studenata \n ");
         printf("\t 5 - Prebroj reci iz fajla \n ");
+        printf("\t 6 - Napravi binarnu datoteku \n ");
+        printf("\t 7 - Iscitaj binarnu datoteku \n ");
         printf("\t 0 - Izlaz iz programa\n ");
         printf("\t >> ");
 
@@ -208,6 +272,8 @@ int main()
             case 3: dinamickoProsirivanjeNiza(); break;
             case 4: ucitatiStudente(); break;
             case 5: prebrojReci("reci.txt"); break;
+            case 6: kreiranjeBinarneDatoteke(); break;
+            case 7: citanjeSadrzajaBinarneDatoteke(); break;
         }
 
     }while(opcija != 0);

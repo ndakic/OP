@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1514720008 source:/home/daka/WorkspaceCB/SerijskaOP/main.c
+	<stdio.h>
+	<stdlib.h>
+
