@@ -33,15 +33,12 @@ void prikaziSadrzajDatoteke(Datoteka *dat);
 void nadjiKraj(Datoteka *dat, int **pozicijaBloka,int **pozicijaSloga);
 void upisiBlok(Datoteka *dat, int adresaBloka, Blok *blok);
 void ucitajBlok(Datoteka *dat, int adresaBloka, Blok *blok);
-int calculateEvidencioniBroj(Datoteka *dat);
+int izracunajEvidencioniBroj(Datoteka *dat);
 int pretraga(Datoteka *dat, char *sifra, int **BrBloka, int **BrSlog);
 void unosSloga(Datoteka *dat);
-void brisanjeSloga(Datoteka *dat, char *sifraSloga);
-
-// TO-DO
-
-// Azuriranje sloga
-// * Fizicko brisanje sloga
+void logickoBrisanjeSloga(Datoteka *dat);
+void izmenaSloga(Datoteka *dat);
+void fizickoBrisanje(Datoteka *dat);
 
 
 void formiranjeDatoteke(){
@@ -195,43 +192,29 @@ void ucitajBlok(Datoteka *dat, int adresaBloka, Blok *blok){
 }
 
 
+int izracunajEvidencioniBroj(Datoteka *dat){
 
+    int pozBloka;
+    int pozSloga;
 
+    int evidBroj;
 
-
-int calculateEvidencioniBroj(Datoteka *dat){
-
-    int count = 0;
-    int i;
-
-    int adresaBloka = 0;
+    nadjiKraj(dat, &pozBloka, &pozSloga);
 
     Blok blok;
 
-    int status = 0;
-
-    while(status == 0){
-
-        ucitajBlok(dat, adresaBloka, &blok);
-
-        for(i=0; i< faktorB; i++){
-            if(blok.zatvorenici[i].evidencioniBroj >=0)
-                count++;
-
-            if(blok.zatvorenici[i].evidencioniBroj == -1){
-                status = 1;
-                break;
-            }
-        }
-
-        adresaBloka++;
-
-        if(adresaBloka == 5){
-            status = 1;
-        }
+    if(pozSloga != 0 ){
+        ucitajBlok(dat, pozBloka, &blok);
+        evidBroj = blok.zatvorenici[pozSloga-1].evidencioniBroj;
     }
 
-    return count;
+    if(pozSloga == 0){
+        ucitajBlok(dat, pozBloka-1, &blok);
+        evidBroj = blok.zatvorenici[2].evidencioniBroj;
+    }
+
+
+    return evidBroj;
 }
 
 int pretraga(Datoteka *dat, char *sifra, int **BrBloka, int **BrSlog){
@@ -283,7 +266,7 @@ int pretraga(Datoteka *dat, char *sifra, int **BrBloka, int **BrSlog){
 void unosSloga(Datoteka *dat){
 
     TZatvorenik zatvorenik;
-    zatvorenik.evidencioniBroj =  calculateEvidencioniBroj(dat) + 1;
+    zatvorenik.evidencioniBroj =  izracunajEvidencioniBroj(dat) + 1;
     zatvorenik.status = 'a';
 
     printf("\nUnesi sifru zatvorenika: ");
@@ -329,7 +312,11 @@ void unosSloga(Datoteka *dat){
 }
 
 
-void brisanjeSloga(Datoteka *dat, char *sifraSloga){
+void logickoBrisanjeSloga(Datoteka *dat){
+
+    char sifraSloga[10];
+    printf("Unesite sifru: ");
+    scanf("%s", sifraSloga);
 
     int brBloka;
     int brSloga;
@@ -421,16 +408,12 @@ void fizickoBrisanje(Datoteka *dat){
     int status = 0;
     int blokBrisanja = 1;
 
-
-
     if(pretraga(dat,sifraZatvornika,&brBloka, &brSloga) == 1){
 
         while(status == 0){
 
             ucitajBlok(dat, brBloka, &blok);
             int i;
-
-            int pomeranje = 0;
 
             for(i = brSloga; i <faktorB; i++){
 
@@ -507,12 +490,7 @@ int main()
                     scanf("%s", sifra);
                     pretraga(&dat, sifra, &brBloka, &brSloga);
                 } break;
-        case 6: if(dat.file){
-                    char sifra[10];
-                    printf("Unesite sifru: ");
-                    scanf("%s", sifra);
-                    brisanjeSloga(&dat, &sifra);
-                }; break;
+        case 6: logickoBrisanjeSloga(&dat); break;
         case 7: izmenaSloga(&dat); break;
         case 8: fizickoBrisanje(&dat); break;
 
