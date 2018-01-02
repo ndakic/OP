@@ -208,9 +208,12 @@ int izracunajEvidencioniBroj(Datoteka *dat){
         evidBroj = blok.zatvorenici[pozSloga-1].evidencioniBroj;
     }
 
-    if(pozSloga == 0){
+    if(pozSloga == 0 && pozBloka > 0){
         ucitajBlok(dat, pozBloka-1, &blok);
         evidBroj = blok.zatvorenici[2].evidencioniBroj;
+    }
+    if(pozSloga == 0 && pozBloka == 0){
+        evidBroj = 1; // ako ne postoji ni jedan slog
     }
 
 
