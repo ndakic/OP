@@ -97,6 +97,7 @@ void prikaziSlog(TZatvorenik zatvorenik){
 
 }
 
+
 void prikaziSadrzajDatoteke(Datoteka *dat){
 
     if(dat->file == NULL){
@@ -114,7 +115,6 @@ void prikaziSadrzajDatoteke(Datoteka *dat){
         for(i=0; i < faktorB; i++){
             if(blok.zatvorenici[i].evidencioniBroj == -1){
                 status = 1;
-                //printf("Kraj je pronadjen u %d bloku na %d mestu\n", redBrBloka, i);
                 break;
             }else{
                 //if(blok.zatvorenici[i].status == 'a')
@@ -193,6 +193,8 @@ void ucitajBlok(Datoteka *dat, int adresaBloka, Blok *blok){
         puts("Greska prilikom citanja bloka!");
     }
 }
+
+
 
 
 
@@ -281,7 +283,7 @@ int pretraga(Datoteka *dat, char *sifra, int **BrBloka, int **BrSlog){
 void unosSloga(Datoteka *dat){
 
     TZatvorenik zatvorenik;
-    zatvorenik.evidencioniBroj =  calculateEvidencioniBroj(dat);
+    zatvorenik.evidencioniBroj =  calculateEvidencioniBroj(dat) + 1;
     zatvorenik.status = 'a';
 
     printf("\nUnesi sifru zatvorenika: ");
@@ -337,8 +339,6 @@ void brisanjeSloga(Datoteka *dat, char *sifraSloga){
         return;
     }
 
-    //printf("Blok: %d, Slog: %d", brBloka, brSloga);
-
     Blok blok;
 
     ucitajBlok(dat, brBloka, &blok);
@@ -350,6 +350,125 @@ void brisanjeSloga(Datoteka *dat, char *sifraSloga){
     puts("Zatvorenik je uspesno obrisan!");
 
 }
+
+void izmenaSloga(Datoteka *dat){
+
+    if(dat->file == NULL){
+        puts("Izaberite datoteku!");
+        return;
+    }
+
+    int brBloka;
+    int brSloga;
+
+    char sifraSloga[10];
+
+    printf("Unesite sifru zatvorenika: ");
+    scanf("%s", sifraSloga);
+
+    if(pretraga(dat, sifraSloga, &brBloka, &brSloga) != 1){
+        return;
+    }
+
+    Blok blok;
+
+    ucitajBlok(dat, brBloka, &blok);
+
+    printf("Zelite li da promenite oznaku celije?(da/ne)");
+
+    char odg1[2];
+    scanf("%s", odg1);
+
+    if(strcmp(odg1, "da") == 0){
+        printf("Unesite novu oznaku celije: ");
+        char oznakaCel[5];
+        scanf("%s", oznakaCel);
+
+        strcpy(blok.zatvorenici[brSloga].oznakaCelije, oznakaCel);
+    }
+
+
+    printf("Zelite li da promenite duzinu kazne?");
+
+    char odg2[2];
+    scanf("%s", odg2);
+
+    if(strcmp(odg2, "da") == 0){
+        printf("Unesite novu duzinu kazne: ");
+        int duzinaKazna;
+        scanf("%d", &duzinaKazna);
+
+        blok.zatvorenici[brSloga].duzinaKazne = duzinaKazna;
+    }
+
+    upisiBlok(dat, brBloka, &blok);
+
+    puts("Uspesno ste izmenili podatke!");
+}
+
+
+void fizickoBrisanje(Datoteka *dat){
+
+    char sifraZatvornika[10];
+    printf("Unesite sifru zatvorenika: ");
+    scanf("%s",sifraZatvornika);
+
+    Blok blok;
+
+    int brBloka;
+    int brSloga;
+
+    int status = 0;
+    int blokBrisanja = 1;
+
+
+
+    if(pretraga(dat,sifraZatvornika,&brBloka, &brSloga) == 1){
+
+        while(status == 0){
+
+            ucitajBlok(dat, brBloka, &blok);
+            int i;
+
+            int pomeranje = 0;
+
+            for(i = brSloga; i <faktorB; i++){
+
+                if(blok.zatvorenici[i].evidencioniBroj == -1){
+                    puts("Kraj!");
+                    status = 1;
+                    break;
+                }
+
+                //ako se nalazi na prva dva mesta, izpomeraj sve od sloga koji se brise
+
+                if(i != 2){
+                    blok.zatvorenici[i] = blok.zatvorenici[i+1];
+                }
+
+                // ako se nalazi na 3 mestu, ucitaj sledeci blok i postavi prvi element sledeceg bloka na 3 mesto
+
+                if(i == 2){
+                    Blok temp;
+                    ucitajBlok(dat, brBloka+1, &temp);
+                    blok.zatvorenici[2] = temp.zatvorenici[0];
+                }
+
+            }
+
+             upisiBlok(dat, brBloka, &blok);
+             brSloga = 0;
+             brBloka++;
+
+        }
+
+    }
+
+        puts("Zatvorenik je uspesno obrisan!");
+
+}
+
+
 
 int main()
 {
@@ -366,6 +485,8 @@ int main()
         printf("4. Unos novog sloga(zatvorenika)\n");
         printf("5. Pretraga sloga(zatvorenika)\n");
         printf("6. Logicko brisanje sloga(zatvorenika)\n");
+        printf("7. Izmena sloga(zatvorenika)\n");
+        printf("8. Fizicko brisanje sloga(zatvorenika)\n");
 
         printf("0. Exit\n");
         printf(">>");
@@ -392,6 +513,8 @@ int main()
                     scanf("%s", sifra);
                     brisanjeSloga(&dat, &sifra);
                 }; break;
+        case 7: izmenaSloga(&dat); break;
+        case 8: fizickoBrisanje(&dat); break;
 
         case 0: if(dat.file){
                     fclose(dat.file);
