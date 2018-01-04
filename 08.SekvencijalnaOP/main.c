@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-#define faktorBlok 3
+#define faktorBlok 5
 
 #define true 1
 #define false 0
@@ -30,8 +30,11 @@ void sacuvajBlok(Datoteka *dat, int adresaBloka, Blok *blok);
 void formiranjeDatoteke();
 void izaberiDatoteku(Datoteka *dat);
 void prikaziSlog(Zatvorenik zatvorenik);
+void prikaziSadrzajDatoteke(Datoteka *dat);
 int nadjiPoziciju(Datoteka *dat, int evidBr, int *redBrBloka, int *redBrSloga);
 void unosSloga(Datoteka *dat);
+void brisanjeSloga(Datoteka *dat);
+
 
 void ucitajBlok(Datoteka *dat, int adresaBloka, Blok *blok){
 
@@ -186,7 +189,6 @@ int nadjiPoziciju(Datoteka *dat, int evidBr, int *redBrBloka, int *redBrSloga){
 
 }
 
-
 void unosSloga(Datoteka *dat){
 
     int redBrBloka;
@@ -213,10 +215,10 @@ void unosSloga(Datoteka *dat){
 
     printf("Pomeranje: %d\n", pomeranje);
 
-    // ako upisujemo na kraj
+    // ako upisujemo na kraj tj. evidBr. novog zatvorenika je najveci
     if(pomeranje == 0){
 
-        if(redBrSloga != 2){
+        if(redBrSloga != faktorBlok-1){
             blok.zatvorenici[redBrSloga] = zatvorenik;
             strcpy(blok.zatvorenici[redBrSloga+1].sifraZatvorenika, "*");
             sacuvajBlok(dat, redBrBloka, &blok);
@@ -230,7 +232,7 @@ void unosSloga(Datoteka *dat){
         }
     }
 
-    // sve ostale pomeriti za jedno mestu u desno
+    // ako postoji veci broj, potrebno je novi ubaciti na njegovo mesto a sve ostale pomeriti za jedno mestu u desno
     if(pomeranje == 1){
 
         int status = 0;
@@ -244,9 +246,10 @@ void unosSloga(Datoteka *dat){
 
             for(i=redBrSloga; i<faktorBlok; i++){
 
+                // ako se u temp1 nalazi slog sa oznakom za kraj
                 if(strcmp(temp1.sifraZatvorenika, "*") == 0){
 
-                    blok.zatvorenici[i] = temp1;
+                    blok.zatvorenici[i] = temp1;    // upisivanje kraja na i-to mesto
                     sacuvajBlok(dat, redBrBloka, &blok);
 
                     status = 1;
@@ -254,14 +257,14 @@ void unosSloga(Datoteka *dat){
 
                 }
 
-                temp2 = blok.zatvorenici[i];
+                temp2 = blok.zatvorenici[i];    // trenutni slog stavi u privremeni 2
 
-                blok.zatvorenici[i] = temp1;
+                blok.zatvorenici[i] = temp1;    // postavi novi slog na trenutni
 
-                temp1 = temp2;
+                temp1 = temp2;                  // prabaci privremeni slog 2 u privremeni 1
 
                 // kada se doslo do kraja bloka i kad je u tempu znak za kraj
-                if(strcmp(temp1.sifraZatvorenika, "*") == 0 && i == 2){
+                if(strcmp(temp1.sifraZatvorenika, "*") == 0 && i == faktorBlok-1){
                     sacuvajBlok(dat, redBrBloka, &blok);
                     Blok noviB;
                     noviB.zatvorenici[0] = temp1;
@@ -273,14 +276,13 @@ void unosSloga(Datoteka *dat){
 
                 }
                 // kada se doslo do kraja bloka i kada u tempu nije znak za kraj
-                if(strcmp(temp1.sifraZatvorenika, "*") != 0 && i == 2){
+                if(strcmp(temp1.sifraZatvorenika, "*") != 0 && i == faktorBlok-1){
 
                     sacuvajBlok(dat, redBrBloka, &blok);
                     redBrBloka++;
                     ucitajBlok(dat, redBrBloka, &blok);
 
-                    zatvorenik = temp1;
-
+                    zatvorenik = temp1; // * slog koji se prenosi iz jednog u drugi blok se postavlja za novi(zatvorenik) jer je na pocetku temp == zatvorenik
                 }
 
             }
@@ -291,6 +293,49 @@ void unosSloga(Datoteka *dat){
     }
 }
 
+
+void brisanjeSloga(Datoteka *dat){
+
+    int kljuc;
+    printf("Unesite sifru: ");
+    scanf("%d", &kljuc);
+
+    int status = 0;
+    int redBrBloka = 0;
+
+    Blok blok;
+
+    int i;
+
+    while(!status){
+
+        ucitajBlok(dat, redBrBloka, &blok);
+
+        for(i=0; i < faktorBlok; i++){
+
+            if(blok.zatvorenici[i].evidencioniBroj == kljuc){
+
+                blok.zatvorenici[i].status = 'n';
+                sacuvajBlok(dat, redBrBloka, &blok);
+
+                printf("Slog je uspesno obrisan!");
+                status = 1;
+                break;
+
+            }
+
+            if(blok.zatvorenici[i].evidencioniBroj > kljuc || strcmp(blok.zatvorenici[i].sifraZatvorenika, "*") == 0){
+                printf("Ne postoji slog sa tom sifrom! Mesto zaustavljanja: Blok: %d, Slog: %d\n", redBrBloka, i);
+                status = 1;
+                break;
+            }
+
+        }
+
+        redBrBloka++;
+    }
+
+}
 
 
 int main()
@@ -306,6 +351,7 @@ int main()
         printf("2. Izaberi datoteku\n");
         printf("3. Prikazi sadrzaj\n");
         printf("4. Unos sloga (zatvorenika)\n");
+        printf("5. Logicko brisanje sloga (zatvorenika)\n");
 
         printf("0. Exit\n");
         printf(">>");
@@ -321,6 +367,8 @@ int main()
         case 3: prikaziSadrzajDatoteke(&dat); break;
 
         case 4: unosSloga(&dat); break;
+
+        case 5: brisanjeSloga(&dat); break;
 
         case 0: if(dat.file){
                     fclose(dat.file);
