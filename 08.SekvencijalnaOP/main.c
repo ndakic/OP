@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string.h>
+
 #define faktorBlok 3
+
+#define true 1
+#define false 0
 
 typedef struct{
     FILE *file;
@@ -23,6 +28,10 @@ typedef struct{
 void ucitajBlok(Datoteka *dat, int adresaBloka, Blok *blok);
 void sacuvajBlok(Datoteka *dat, int adresaBloka, Blok *blok);
 void formiranjeDatoteke();
+void izaberiDatoteku(Datoteka *dat);
+void prikaziSlog(Zatvorenik zatvorenik);
+int nadjiPoziciju(Datoteka *dat, int evidBr, int *redBrBloka, int *redBrSloga);
+void unosSloga(Datoteka *dat);
 
 void ucitajBlok(Datoteka *dat, int adresaBloka, Blok *blok){
 
@@ -79,22 +88,213 @@ void formiranjeDatoteke(){
 
 }
 
+void izaberiDatoteku(Datoteka *dat){
 
-// TO-DO
+    printf("Unesite naziv datoteke: ");
+    scanf("%s", dat->nazivDatoteke);
 
-// formiranje datoteke  x
-// unos novog sloga
-// ažuriranje sloga
-// logicko brisanje sloga
-// pretraga po ključu
-// reorganizacija datoteke
-// ispis svih slogova
+    dat->file = fopen(dat->nazivDatoteke, "rb+");
+
+    if(dat->file == NULL)
+        printf("\nDatoteka %s nije uspesno ucitana!\n", dat->nazivDatoteke);
+    else
+        printf("\nDatoteka je uspesno ucitana!\n");
+
+}
+
+void prikaziSlog(Zatvorenik zatvorenik){
+
+    puts("-------------------------------------------------------");
+    printf("Evidencioni broj: %d\n", zatvorenik.evidencioniBroj);
+    printf("Sifra zatvorenika: %s\n", zatvorenik.sifraZatvorenika);
+    printf("Oznaka celije: %s\n", zatvorenik.oznakaCelije);
+    printf("duzina kazne: %d\n", zatvorenik.duzinaKazne);
+    printf("status: %c\n", zatvorenik.status);
+    puts("-------------------------------------------------------");
+
+}
+
+void prikaziSadrzajDatoteke(Datoteka *dat){
+
+    if(dat->file == NULL){
+        puts("Izaberite datoteku!");
+        return;
+    }
+
+    int adresaBloka = 0;
+    int i;
+
+    Blok blok;
+
+    while(true){
+        ucitajBlok(dat, adresaBloka, &blok);
+
+        for(i=0; i < faktorBlok; i++){
+
+            int kraj = strcmp(blok.zatvorenici[i].sifraZatvorenika, "*");
+
+            if(!kraj){
+                return;
+            }
+
+            prikaziSlog(blok.zatvorenici[i]);
+
+        }
+        adresaBloka++;
+    }
+
+}
+
+int nadjiPoziciju(Datoteka *dat, int evidBr, int *redBrBloka, int *redBrSloga){
+
+    if(dat->file == NULL){
+        puts("Izaberite datoteku!");
+        return;
+    }
+
+    int adresaBloka = 0;
+    int i;
+
+    Blok blok;
+
+    while(true){
+
+        ucitajBlok(dat, adresaBloka, &blok);
+
+        for(i=0; i < faktorBlok; i++){
+
+            int kraj = strcmp(blok.zatvorenici[i].sifraZatvorenika, "*");
+            // ako ne postoji veci, novi slog dodajem na kraj
+            if(kraj == 0){
+
+                *redBrBloka = adresaBloka;
+                *redBrSloga = i;
+
+                return 0; // ne vrsi se pomeranje, samo na kraj dodam novi slog
+            }
+
+            // ako postoji broj koji je veci, znaci da mora negde izmedju da se uglavi novi broj
+            if(blok.zatvorenici[i].evidencioniBroj > evidBr){
+                *redBrBloka = adresaBloka;
+                *redBrSloga = i;
+
+                return 1; // vrsi se pomeranje svih slogova za jedno mestu u desno
+            }
+        }
+        adresaBloka++;
+    }
+
+}
+
+
+void unosSloga(Datoteka *dat){
+
+    int redBrBloka;
+    int redBrSloga;
+
+    Zatvorenik zatvorenik;
+
+    strcpy(zatvorenik.sifraZatvorenika, "113d");
+    strcpy(zatvorenik.oznakaCelije, "F4");
+    zatvorenik.duzinaKazne = 33;
+    zatvorenik.status = 'a';
+
+    printf("Unesite evidencioni broj: ");
+    int evidBroj;
+    scanf("%d", &evidBroj);
+    zatvorenik.evidencioniBroj = evidBroj;
+
+    int pomeranje = nadjiPoziciju(dat, evidBroj, &redBrBloka, &redBrSloga);
+    printf("Zatvorenika treba postavi na: blok: %d, slog: %d\n", redBrBloka, redBrSloga);
+
+    Blok blok;
+
+    ucitajBlok(dat, redBrBloka, &blok);
+
+    printf("Pomeranje: %d\n", pomeranje);
+
+    // ako upisujemo na kraj
+    if(pomeranje == 0){
+
+        if(redBrSloga != 2){
+            blok.zatvorenici[redBrSloga] = zatvorenik;
+            strcpy(blok.zatvorenici[redBrSloga+1].sifraZatvorenika, "*");
+            sacuvajBlok(dat, redBrBloka, &blok);
+        }else{
+            blok.zatvorenici[redBrSloga] = zatvorenik;
+            sacuvajBlok(dat, redBrBloka, &blok);
+
+            Blok novi_blok;
+            strcpy(novi_blok.zatvorenici[0].sifraZatvorenika, "*");
+            sacuvajBlok(dat, redBrBloka+1, &novi_blok);
+        }
+    }
+
+    // sve ostale pomeriti za jedno mestu u desno
+    if(pomeranje == 1){
+
+        int status = 0;
+
+        while(status == 0){
+
+            Zatvorenik temp1 = zatvorenik;
+            Zatvorenik temp2;
+
+            int i;
+
+            for(i=redBrSloga; i<faktorBlok; i++){
+
+                if(strcmp(temp1.sifraZatvorenika, "*") == 0){
+
+                    blok.zatvorenici[i] = temp1;
+                    sacuvajBlok(dat, redBrBloka, &blok);
+
+                    status = 1;
+                    break;
+
+                }
+
+                temp2 = blok.zatvorenici[i];
+
+                blok.zatvorenici[i] = temp1;
+
+                temp1 = temp2;
+
+                // kada se doslo do kraja bloka i kad je u tempu znak za kraj
+                if(strcmp(temp1.sifraZatvorenika, "*") == 0 && i == 2){
+                    sacuvajBlok(dat, redBrBloka, &blok);
+                    Blok noviB;
+                    noviB.zatvorenici[0] = temp1;
+                    redBrBloka++;
+                    sacuvajBlok(dat, redBrBloka, &noviB);
+
+                    status = 1;
+                    break;
+
+                }
+                // kada se doslo do kraja bloka i kada u tempu nije znak za kraj
+                if(strcmp(temp1.sifraZatvorenika, "*") != 0 && i == 2){
+
+                    sacuvajBlok(dat, redBrBloka, &blok);
+                    redBrBloka++;
+                    ucitajBlok(dat, redBrBloka, &blok);
+
+                    zatvorenik = temp1;
+
+                }
+
+            }
+
+            redBrSloga = 0;
+        }
+
+    }
+}
 
 
 
 int main()
 {
-
     Datoteka dat;
     dat.file = NULL;
 
@@ -102,7 +302,10 @@ int main()
 
     do{
         printf("\n==============================\n");
-        printf("1. Formiraj Datoteku\n");
+        printf("1. Formiraj datoteku\n");
+        printf("2. Izaberi datoteku\n");
+        printf("3. Prikazi sadrzaj\n");
+        printf("4. Unos sloga (zatvorenika)\n");
 
         printf("0. Exit\n");
         printf(">>");
@@ -112,6 +315,12 @@ int main()
         switch(opcija){
 
         case 1: formiranjeDatoteke(); break;
+
+        case 2: izaberiDatoteku(&dat); break;
+
+        case 3: prikaziSadrzajDatoteke(&dat); break;
+
+        case 4: unosSloga(&dat); break;
 
         case 0: if(dat.file){
                     fclose(dat.file);
