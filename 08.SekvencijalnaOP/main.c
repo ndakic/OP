@@ -421,6 +421,31 @@ void izmenaSloga(Datoteka *dat){
 
 }
 
+void oslobodiSlog(Datoteka *datoteka){
+
+    int blBrojac = 0;
+
+    Blok blok;
+
+    ucitajBlok(datoteka, blBrojac, &blok);
+
+
+    Zatvorenik zat = blok.zatvorenici[2];
+
+
+    Zatvorenik *zatv = &zat;
+
+    //prikaziSlog(zatv);
+
+    printf("%d", zatv->duzinaKazne);
+
+    free(zatv);
+
+    sacuvajBlok(datoteka, blBrojac, &blok);
+
+
+}
+
 
 int main()
 {
@@ -437,6 +462,7 @@ int main()
         printf("4. Unos sloga (zatvorenika)\n");
         printf("5. Logicko brisanje sloga (zatvorenika)\n");
         printf("6. Izmena sloga (zatvorenika)\n");
+        printf("7. Oslobodi slog (zatvorenika)\n");
 
         printf("0. Exit\n");
         printf(">>");
@@ -456,6 +482,8 @@ int main()
         case 5: brisanjeSloga(&dat); break;
 
         case 6: izmenaSloga(&dat); break;
+
+        case 7: oslobodiSlog(&dat); break;
 
         case 0: if(dat.file){
                     fclose(dat.file);
