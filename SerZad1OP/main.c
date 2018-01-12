@@ -41,7 +41,7 @@ void printAll(TFile *file);
 
 int search(TFile *file, int id, int *blockPos, int *prisPos);
 
-void addPrisoner(TFile *file);
+void addPrisoner(TFile *file, Prisoner newPrisoner);
 void updatePrisoner(TFile *file);
 int deletePrisoner(TFile *file);
 
@@ -186,8 +186,7 @@ int search(TFile *file, int key, int *blockPos, int *prisPos){
 
 }
 
-
-void addPrisoner(TFile *file){
+void callAddNewPrisonerSer(TFile *file){
 
     Prisoner newPrisoner;
 
@@ -199,6 +198,14 @@ void addPrisoner(TFile *file){
 
     printf("Enter length of sentence: ");
     scanf("%d", &newPrisoner.lengthOfSentence);
+
+    addPrisoner(file, newPrisoner);
+
+
+}
+
+
+void addPrisoner(TFile *file, Prisoner newPrisoner){
 
     int blockPos;
     int prisonerPos;
@@ -342,15 +349,6 @@ int deletePrisoner(TFile *file){
 }
 
 
-// sequential
-
-// search
-// add
-// reorganization
-// delete
-
-// load serial and then sort it
-
 
 int searchSeq(TFile *file, int key, int *blockPosition, int *prisonerPosition){
 
@@ -398,8 +396,6 @@ int searchSeq(TFile *file, int key, int *blockPosition, int *prisonerPosition){
 
 
 int callAddNewPrisonerSeq(TFile *file){
-
-    TFile *newPointer = &file;
 
     Prisoner newPrisoner;
     newPrisoner.status = 'a';
@@ -640,6 +636,79 @@ int physicalDeletionSeq(TFile *file){
 }
 
 
+int compare(const void *s1, const void *s2){
+
+    Prisoner *p1 = (Prisoner *)s1;
+    Prisoner *p2 = (Prisoner *)s2;
+
+    if(p1->recordNumber > p2->recordNumber)
+        return 1;
+    else
+        return -1;
+
+}
+
+
+
+int loadSerialAndMakeSequential(TFile *file){
+
+    Prisoner prisoners[50];
+
+    int prisoner_pos = 0;
+
+    int block_count = 0;
+    int status = 0;
+    int i;
+
+    Block block;
+
+    while(status == 0){
+
+        readBlock(file, block_count, &block);
+
+        for(i=0; i < factorB; i++){
+
+            if(strcmp(block.prisoners[i].id, "*") == 0){
+                status = 1;
+                break;
+            }
+
+            prisoners[prisoner_pos] = block.prisoners[i];
+
+            prisoner_pos++;
+        }
+
+        block_count++;
+
+    }
+
+    qsort(prisoners, prisoner_pos, sizeof(Prisoner), compare);
+
+
+    createFile(); // enter SeqFromSer.txt for fileName
+
+    TFile newFile;
+
+    newFile.file = fopen("SeqFromSer.txt", "rb+");
+
+    if(newFile.file != NULL)
+        puts("New File is loaded!");
+    else{
+        puts("New File is empty. Error!");
+        return 0;
+    }
+
+
+    for(i=0; i < prisoner_pos; i++){
+        printPrisoner(prisoners[i]);
+        addPrisoner(&newFile, prisoners[i]);
+    }
+
+    fclose(newFile.file);
+
+}
+
+
 
 int main()
 {
@@ -668,6 +737,8 @@ int main()
         printf("\t9. Physical deletion\n");
         printf("\t10. Logical deletion\n");
 
+        printf("\t11. Load Serial and Make Sequential\n");
+
         printf("\n===================\n");
 
         printf("0. Exit\n");
@@ -683,7 +754,7 @@ int main()
 
             case 3: printAll(&file); break;
 
-            case 4: addPrisoner(&file); break;
+            case 4: callAddNewPrisonerSer(&file); break;
 
             case 5: updatePrisoner(&file); break;
 
@@ -696,6 +767,8 @@ int main()
             case 9: physicalDeletionSeq(&file); break;
 
             case 10: logicalDelete(&file); break;
+
+            case 11: loadSerialAndMakeSequential(&file); break;
 
             case 0: exit(0); break;
 
