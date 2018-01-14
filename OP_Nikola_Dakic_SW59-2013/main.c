@@ -3,6 +3,7 @@
 
 #define factorB 3
 #define FILENAME_MAX 30
+#define MAX_CREDITS 40
 
 #define true 1
 #define false 0
@@ -38,10 +39,18 @@ void createFile();
 void chooseFile(TFile *file);
 void printActiveFile(TFile *file);
 
-int addNewCredit(TFile *file);
+int addNewCredit(TFile *file, Credit new_credit);
+int callAddNewCredit(TFile *file);
 
 void printCredit(Credit credit);
 int printAllCredits(TFile *file);
+
+int compare(const void *c1, const void *c2);
+int loadSerialAndMakeSequential(TFile *file);
+
+
+
+// ========================================================== //
 
 
 
@@ -152,15 +161,12 @@ int searchSerial(TFile *file, int key, int *blockPos, int *creditPos){
 }
 
 
-int addNewCredit(TFile *file){
+int callAddNewCredit(TFile *file){
 
     if(file->file == NULL){
         puts("First choose file!");
         return 99;
     }
-
-    int block_position = 0;
-    int credit_position;
 
     printf("Enter record number: ");
     int key;
@@ -171,7 +177,20 @@ int addNewCredit(TFile *file){
         return 99;
     }
 
-    int status = searchSerial(file, key, &block_position, &credit_position);
+    Credit credit;
+    credit.record_number = key;
+
+    addNewCredit(file, credit);
+
+}
+
+
+int addNewCredit(TFile *file, Credit new_credit){
+
+    int block_position = 0;
+    int credit_position;
+
+    int status = searchSerial(file, new_credit.record_number, &block_position, &credit_position);
 
     if(status == 1){
         puts("Credit with that record number already exist!");
@@ -179,9 +198,6 @@ int addNewCredit(TFile *file){
     }
 
     if(status == 0){
-
-        Credit new_credit;
-        new_credit.record_number = key;
 
         Block block;
         readBlock(file, block_position, &block);
@@ -194,14 +210,14 @@ int addNewCredit(TFile *file){
             saveBlock(file, block_position+1, &new_block);
             return 1;
         }else{
-
             block.credits[credit_position+1].record_number = -1;
             saveBlock(file, block_position, &block);
         }
 
+         puts("Credit successfully added!");
+
     }
 
-    puts("Credit successfully added!");
 
 }
 
@@ -222,6 +238,11 @@ void printCredit(Credit credit){
 
 int printAllCredits(TFile *file){
 
+    if(file->file == NULL){
+        puts("First choose file!");
+        return 99;
+    }
+
     int block_position = 0;
     int i;
 
@@ -235,12 +256,91 @@ int printAllCredits(TFile *file){
 
             if(block.credits[i].record_number == -1)
                 return 0;
-
+            puts("-------------------------------------------------------");
+            printf("Block position: %d, credit position: %d\n", block_position+1, i+1);
             printCredit(block.credits[i]);
         }
 
         block_position++;
     }
+}
+
+
+int compare(const void *c1, const void *c2){
+
+    Credit *credit1 = (Credit*)c1;
+    Credit *credit2 = (Credit*)c2;
+
+    if(credit1->record_number > credit2->record_number)
+        return 1;
+    else
+        return -1;
+
+}
+
+
+int loadSerialAndMakeSequential(TFile *file){
+
+    if(file->file == NULL){
+        puts("First choose file!");
+        return 99;
+    }
+
+    Credit credits[MAX_CREDITS];
+
+    int block_position = 0;
+    int credits_count = 0;
+
+    int status = 0;
+    int i;
+
+    Block block;
+
+    while(status == 0){
+
+        readBlock(file, block_position, &block);
+
+        for(i=0; i < factorB; i++){
+
+            if(block.credits[i].record_number == -1){
+                status = 1;
+                break;
+            }
+
+            credits[credits_count] = block.credits[i];
+            credits_count++;
+        }
+
+        block_position++;
+    }
+
+    qsort(credits, credits_count, sizeof(Credit), compare);
+
+
+    // create seq file
+
+    TFile new_file;
+
+    printf("Enter filename for sequential file: ");
+    scanf("%s", new_file.fileName);
+
+    new_file.file = fopen(new_file.fileName, "wb+");
+
+    Block init_block;
+    init_block.credits[0].record_number = -1;
+
+    saveBlock(&new_file, 0, &init_block);
+
+    for(i=0; i<credits_count; i++){
+        addNewCredit(&new_file, credits[i]);
+    }
+
+    fclose(new_file.file);
+
+    puts("Sequential file successfully created!");
+
+    return 1;
+
 }
 
 int main()
@@ -259,6 +359,7 @@ int main()
         printf("3. Print active file\n");
         printf("4. Add new Credit\n");
         printf("5. Print all Credits\n");
+        printf("6. Create Sequential file\n");
         printf("0. Exit\n");
         printf("\n===================\n");
 
@@ -274,9 +375,11 @@ int main()
 
             case 3: printActiveFile(&file); break;
 
-            case 4: addNewCredit(&file); break;
+            case 4: callAddNewCredit(&file); break;
 
             case 5: printAllCredits(&file); break;
+
+            case 6: loadSerialAndMakeSequential(&file); break;
 
             case 0: exit(EXIT_FAILURE);
         }
