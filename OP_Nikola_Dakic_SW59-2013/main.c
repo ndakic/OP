@@ -130,7 +130,41 @@ void display(TreeNode *temp){
 
     if (temp->right != NULL)
         display(temp->right);
+}
 
+TreeNode* searchTree2(int key, TreeNode *temp, int *block){
+
+    TreeNode *empty = (TreeNode*)malloc(sizeof(TreeNode));
+
+    //puts("1");
+    if(temp != NULL){
+        block = temp->block_address;
+        printf("block: %d\n", block);
+        printf("key: %d\n", temp->key);
+    }
+
+    if(temp == NULL ||  temp->key == key ||temp->key > key){
+
+        if(temp == NULL){
+            empty->block_address = block;
+            empty->key = -1;
+            puts("empty");
+            return empty;
+        }else{
+            puts("temp");
+            return temp;
+        }
+
+    }
+
+    //printf("key: %d\n", temp->block_address);
+
+    if(key < temp->key)
+        return searchTree2(key, temp->left, block);
+
+    //puts("2");
+
+    return searchTree2(key, temp->right, block);
 }
 
 TreeNode* searchTree(int key, TreeNode *temp, int *block){
@@ -141,17 +175,23 @@ TreeNode* searchTree(int key, TreeNode *temp, int *block){
     if(temp != NULL){
         block = temp->block_address;
         printf("block: %d\n", block);
+        printf("key: %d\n", temp->key);
     }
 
     if(temp == NULL || temp->key == key){
-        //printf("key: %d\n", temp->key);
+
+
 
         if(temp == NULL){
             empty->block_address = block;
             empty->key = -1;
+            puts("empty");
             return empty;
-        }else
+        }else{
+            puts("temp");
             return temp;
+        }
+
     }
 
     //printf("key: %d\n", temp->block_address);
@@ -204,6 +244,8 @@ void savePZBlock(TFile *file, int blockPosition, PZBlock *pz_block){
     status = fwrite(pz_block, sizeof(PZBlock), 1, file->file);
     if(status != 1)
         puts("Write Error!");
+
+    printf("block sacuvan na poziciju: %d\n", blockPosition);
 
 }
 
@@ -470,6 +512,7 @@ int printAllCredits(TFile *file){
 
             if(block.credits[i].record_number == -1)
                 return 0;
+
             puts("-------------------------------------------------------");
             printf("Block position: %d, credit position: %d\n", block_position+1, i+1);
             printCredit(block.credits[i]);
@@ -578,6 +621,98 @@ int searchNextPositionOverflowZone(){
     }
 }
 
+void createIndexZone(TreeNode **root){
+
+TFile pzFile;
+    pzFile.file = fopen("primary_zone", "rb+");
+
+    int block_pos = 0;
+    PZBlock blockPZ;
+
+    int index_status = 0;
+
+    TreeNode nodes[50];
+
+    Credit credit;
+    credit.record_number = -1;
+
+    int i;
+
+    while(index_status == 0){
+
+        readPZBlock(&pzFile, block_pos, &blockPZ);
+
+        for(i=0; i < factorB; i++){
+
+            printf("i: %d\n", i);
+            printf("block: %d\n", block_pos);
+
+            if(blockPZ.credits[i].record_number == -1 && i != 0){
+
+                TreeNode node;
+                node.key = credit.record_number;
+                node.block_address = block_pos;
+
+                nodes[block_pos] = node;
+                index_status = 1;
+
+                TreeNode end;
+                end.key = -1;
+                end.block_address = -1;
+                block_pos++;
+                nodes[block_pos] = end;
+
+                break;
+
+            }
+
+            if(blockPZ.credits[i].record_number == -1){
+                index_status = 1;
+
+                TreeNode end;
+                end.key = -1;
+                end.block_address = -1;
+                block_pos++;
+                nodes[block_pos] = end;
+                break;
+            }
+
+            if(blockPZ.credits[i].record_number > credit.record_number){
+                credit = blockPZ.credits[i];
+
+            }
+
+        }
+
+        if(index_status == 0){
+            TreeNode node;
+            node.key = credit.record_number;
+            node.block_address = block_pos;
+
+            nodes[block_pos] = node;
+            block_pos++;
+        }
+
+    }
+
+    fclose(pzFile.file);
+
+    //for(i=0; i < block_pos; i++){ printf("node:%d\n", nodes[i].block_address);}
+
+    int n = block_pos;
+
+    TreeNode *p;
+    p = bst(nodes, 0, n-1);
+
+    *root = p;
+
+
+   // printf("root: %d\n", p->block_address);
+    //printf("left: %d\n", p->left->block_address);
+    //printf("right: %d\n", p->block_address);
+
+
+}
 
 int createPrimaryZoneAndOverwlofZone(TFile *file, TreeNode **root){
 
@@ -691,90 +826,7 @@ int createPrimaryZoneAndOverwlofZone(TFile *file, TreeNode **root){
 
     // create index zone
 
-       TFile pzFile;
-    pzFile.file = fopen("primary_zone", "rb+");
-
-    int block_pos = 0;
-    PZBlock blockPZ;
-
-    int index_status = 0;
-
-    TreeNode nodes[50];
-
-    Credit credit;
-    credit.record_number = -1;
-
-    //int i;
-
-    while(index_status == 0){
-
-        readPZBlock(&pzFile, block_pos, &blockPZ);
-
-        for(i=0; i < factorB; i++){
-
-            if(blockPZ.credits[i].record_number == -1 && i != 0){
-
-                TreeNode node;
-                node.key = credit.record_number;
-                node.block_address = block_pos;
-
-                nodes[block_pos] = node;
-                index_status = 1;
-
-                TreeNode end;
-                end.key = -1;
-                end.block_address = -1;
-                block_pos++;
-                nodes[block_pos] = end;
-
-                break;
-
-            }
-
-            if(blockPZ.credits[i].record_number == -1){
-                index_status = 1;
-
-                TreeNode end;
-                end.key = -1;
-                end.block_address = -1;
-                block_pos++;
-                nodes[block_pos] = end;
-                break;
-            }
-
-            if(blockPZ.credits[i].record_number > credit.record_number){
-                credit = blockPZ.credits[i];
-
-            }
-
-        }
-
-        if(index_status == 0){
-            TreeNode node;
-            node.key = credit.record_number;
-            node.block_address = block_pos;
-
-            nodes[block_pos] = node;
-            block_pos++;
-        }
-
-    }
-
-    fclose(pzFile.file);
-
-    //for(i=0; i < block_pos; i++){ printf("node:%d\n", nodes[i].block_address);}
-
-    int n = block_pos;
-
-    TreeNode *p;
-    p = bst(nodes, 0, n-1);
-
-    *root = p;
-
-
-   // printf("root: %d\n", p->block_address);
-    //printf("left: %d\n", p->left->block_address);
-    //printf("right: %d\n", p->block_address);
+    createIndexZone(root);
 
 
 }
@@ -805,7 +857,7 @@ int printPrimaryZone(TFile *file){
 
             printCredit(pzBlock.credits[i]);
         }
-        printOverflow(pzBlock.overflow);
+        //printOverflow(pzBlock.overflow);
         pz_block_position++;
 
     }
@@ -878,9 +930,12 @@ int search(TFile *file, TreeNode *root, int key, int *blockPosition, int *credit
 
     }
 
+    *blockPosition = result->block_address;
+    return 5;
+
 }
 
-int addNewCreditInPrimaryZone(TFile *file, TreeNode *root){
+int addNewCreditInPrimaryZone(TFile *file, TreeNode *root, TreeNode **root2){
 
     // proveriti pretragom stabla da li vec postoji
 
@@ -899,34 +954,63 @@ int addNewCreditInPrimaryZone(TFile *file, TreeNode *root){
     printf("block pos: %d\n", block_pos);
     printf("credi pos: %d\n", credit_pos);
 
+    if(status == 5){
+
+        PZBlock pz_block;
+        readPZBlock(file, block_pos+1, &pz_block);
+        credit_pos = 0;
+
+        if(pz_block.credits[credit_pos].record_number == -1){
+
+            puts("aaa");
+
+            Credit temp = pz_block.credits[credit_pos];
+
+            pz_block.credits[credit_pos] = newCredit;
+
+            pz_block.credits[credit_pos+1] = temp;
+
+            savePZBlock(file, block_pos+1, &pz_block);
+            //createIndexZone(root2);
+            return 12;
+
+        }
+
+    }
+
 
     if(status == 0){
 
         PZBlock pz_block;
         readPZBlock(file, block_pos, &pz_block);
-        int i;
 
-        Credit temp;
+        Credit temp = pz_block.credits[credit_pos];
+
+        printf("temp: %d\n", temp.record_number);
 
         pz_block.credits[credit_pos] = newCredit;
+
+        printf("current: %d\n", pz_block.credits[credit_pos].record_number);
 
         if(credit_pos == factorB-1){
 
             savePZBlock(file, block_pos, &pz_block);
 
             PZBlock new_block;
-            new_block.credits[0].record_number = -1;
+            new_block.credits[0] = temp;
             new_block.overflow.credit.record_number = -1;
             new_block.overflow.next.block_address = -1;
-            saveBlock(file, block_pos+1, &new_block);
+            savePZBlock(file, block_pos+1, &new_block);
 
+            puts("Dovde doslo!");
+            //createIndexZone(root2);
             return 44;
         }
 
-        pz_block.credits[credit_pos+1].record_number = -1;
+        pz_block.credits[credit_pos+1] = temp;
 
         savePZBlock(file, block_pos, &pz_block);
-
+        createIndexZone(root2);
         return 112;
 
     }
@@ -960,6 +1044,7 @@ int addNewCreditInPrimaryZone(TFile *file, TreeNode *root){
                 new_block.overflow.next.block_address = -1;
                 saveBlock(file, block_pos+1, &new_block);
                 puts("aloo");
+                createIndexZone(root2);
                 return 13;
 
              }
@@ -970,6 +1055,7 @@ int addNewCreditInPrimaryZone(TFile *file, TreeNode *root){
 
                 saveBlock(file, block_pos, &pz_block);
                 puts("alo12");
+                createIndexZone(root2);
                 return 11;
 
              }
@@ -1092,20 +1178,148 @@ int searchIndexZone(TreeNode *root){
 
     int block;
 
-    TreeNode* result = searchTree(key, root, &block);
+    TreeNode* result = searchTree2(key, root, &block);
 
     printf("blockaa: %d\n", result->block_address);
 
+    printf("keey: %d\n", result->key);
+
     if(result->key == -1){
-        puts("nema ovoga!");
+        puts("Ne postoji trazeni kredit!");
     }else{
-        puts("ima ovoga!");
+
+        TFile file;
+        file.file = fopen("primary_zone", "rb+");
+
+        puts("1");
+        PZBlock pz_block;
+        readPZBlock(&file, result->block_address, &pz_block);
+        puts("2");
+        int i;
+
+        int status = 0;
+        int poz = 0;
+
+        for(i=0; i < factorB; i++){
+
+            if(pz_block.credits[i].record_number == key){
+
+                status = 1;
+                poz = i;
+            }
+
+        }
+
+        if(status == 1){
+            printf("Kredit je pronadjen u bloku: %d na poziciji %d \n", result->block_address, poz);
+        }else{
+            puts("Ne postoji trazeni kredit!");
+        }
+
+        fclose(file.file);
+
+
     }
 
     return 11;
 }
 
+int logicalDeleteCredit(TFile *file, TreeNode *root){
 
+    printf("Unesite kljuc: ");
+    int key;
+
+    scanf("%d", &key);
+
+    int blockPos;
+    int creditPos;
+
+    int status = search(file, root, key, &blockPos, &creditPos);
+
+    printf("bl: %d, cre: %d", blockPos, creditPos);
+
+    PZBlock block;
+
+    readPZBlock(file, blockPos, &block);
+
+    block.credits[creditPos].status = 'i';
+
+    savePZBlock(file, blockPos, &block);
+
+    puts("Kredit je uspesno obrisan!");
+
+
+    return 0;
+
+
+}
+
+int reorganization(TFile *file){
+
+    int block_count = 0;
+
+    PZBlock pz_block;
+
+    int i;
+
+    while(true){
+
+
+        readPZBlock(file, block_count, &pz_block);
+
+        for(i=0; i < factorB; i++){
+
+            if(pz_block.credits[i].record_number == -1){
+                puts("Reorganizacije je zavrsena!");
+                return 1;
+            }
+
+            //addNewCreditInPrimaryZone()
+
+        }
+
+
+    }
+
+
+
+}
+
+int averageCredit(TFile *file){
+
+    int block_count = 0;
+
+    PZBlock pz_block;
+
+    int i;
+
+    int total = 0;
+    int n = 0;
+
+    int status = 0;
+
+    while(status == 0){
+
+
+        readPZBlock(file, block_count, &pz_block);
+
+        for(i=0; i < factorB; i++){
+
+            if(pz_block.credits[i].record_number == -1){
+                status = 1;
+                puts("Reorganizacije je zavrsena!");
+            }
+
+            total += pz_block.credits[i].loan_amount;
+            n++;
+
+        }
+
+    }
+
+    printf("Prosek: %d\n", total / n);
+
+}
 
 
 int main()
@@ -1127,10 +1341,13 @@ int main()
         printf("4. Add new Credit\n");
         printf("5. Print all Credits\n");
         printf("6. Create Sequential file\n");
-        printf("7. Create Primary And Overflow Zone\n");
+        printf("7. Create Primary, Overflow and Index Zone\n");
         printf("8. Print Primary And Overflow Zone\n");
         printf("9. Add New in Primary And Overflow Zone\n");
         printf("10. Search Index Zone\n");
+        printf("11. Logical Delete from Primary Zone\n");
+        printf("12. Reorganization\n");
+        printf("13. Average credit amount\n");
         printf("0. Exit\n");
         printf("\n===================\n");
 
@@ -1155,9 +1372,15 @@ int main()
 
             case 8: printPrimaryZone(&file); break;
 
-            case 9: addNewCreditInPrimaryZone(&file, root); break;
+            //case 9: addNewCreditInPrimaryZone(&file, root, &root); break;
 
             case 10: searchIndexZone(root); break;
+
+            case 11: logicalDeleteCredit(&file, root); break;
+
+            case 12: reorganization(&file); break;
+
+            case 13: averageCredit(&file); break;
 
             case 0: exit(EXIT_FAILURE);
         }
