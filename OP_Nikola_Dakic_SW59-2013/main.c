@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <string.h>
+
+#define serial_factorB 5
 #define factorB 3
 #define FILENAME_MAX 30
 #define MAX_CREDITS 40
@@ -25,6 +28,11 @@ typedef struct{
 
 }Credit;
 
+
+typedef struct{
+    Credit credits[serial_factorB];
+}SerialBlock;
+
 typedef struct{
     Credit credits[factorB];
 }Block;
@@ -43,6 +51,33 @@ typedef struct{
                         // SAVE-READ
 
 // ==========================================================
+
+void saveSerialBlock(TFile *file, int blockPosition, SerialBlock *block){
+
+    int status;
+
+    status = fseek(file->file, blockPosition * sizeof(SerialBlock), SEEK_SET);
+    if(status != 0)
+        puts("Seek Serial BlockError!");
+
+    status = fwrite(block, sizeof(SerialBlock), 1, file->file);
+    if(status != 1)
+        puts("Write Serial Block Error!");
+
+}
+
+void readSerialBlock(TFile *file, int blockPosition, SerialBlock *block){
+
+    int status;
+
+    status = fseek(file->file, blockPosition * sizeof(SerialBlock), SEEK_SET);
+    if(status != 0)
+        puts("Seek Serial Block Error!");
+
+    status = fread(block, sizeof(SerialBlock), 1, file->file);
+    if(status != 1)
+        puts("Read Serial Block Error!");
+}
 
 void saveBlock(TFile *file, int blockPosition, Block *block){
 
@@ -193,7 +228,11 @@ TreeNode* searchTree(int key, TreeNode *temp, int *block){
 
     if(temp != NULL){
         printf("kljuc: %d\n", temp->key);
-        *block = temp->block_address;
+        if(temp->left->key > key){
+            block = temp->left->block_address;
+            printf("blooook: %d\n", block);
+        }
+
     }
 
     if(temp == NULL || temp->key == key){
@@ -249,9 +288,7 @@ void readTreeNode(TFile *file, int nodePosition, TreeNode *treeNode){
 
 }
 
-
 // ================ Serial and Sequential ====================== //
-
 
 void createFile(){
 
@@ -262,10 +299,10 @@ void createFile(){
 
     file.file = fopen(file.fileName, "wb+");
 
-    Block block;
+    SerialBlock block;
     block.credits[0].record_number = -1;
 
-    saveBlock(&file, 0, &block);
+    saveSerialBlock(&file, 0, &block);
 
     fclose(file.file);
 
@@ -308,15 +345,15 @@ int searchSerial(TFile *file, int key, int *blockPos, int *creditPos){
 
     int block_position = 0;
 
-    Block block;
+    SerialBlock block;
     int i;
 
     // find end position
     while(true){
 
-        readBlock(file, block_position, &block);
+        readSerialBlock(file, block_position, &block);
 
-        for(i=0; i < factorB; i++){
+        for(i=0; i < serial_factorB; i++){
 
             //end
             if(block.credits[i].record_number == -1){
@@ -359,11 +396,47 @@ int callAddNewCredit(TFile *file){
     printf("Loan amount: ");
     scanf("%d", &credit.loan_amount);
 
-    addNewCredit(file, credit);
+    addNewCreditSerial(file, credit);
 
 }
 
-int addNewCredit(TFile *file, Credit new_credit){
+int addNewCreditSerial(TFile *file, Credit new_credit){
+
+    int block_position = 0;
+    int credit_position;
+
+    int status = searchSerial(file, new_credit.record_number, &block_position, &credit_position);
+
+    if(status == 1){
+        puts("Credit with that record number already exist!");
+        return 99;
+    }
+
+    if(status == 0){
+
+        SerialBlock block;
+        readSerialBlock(file, block_position, &block);
+        block.credits[credit_position] = new_credit;
+
+        if(credit_position == serial_factorB-1){
+            saveSerialBlock(file, block_position, &block);
+            SerialBlock new_block;
+            new_block.credits[0].record_number = -1;
+            saveSerialBlock(file, block_position+1, &new_block);
+            return 1;
+        }else{
+            block.credits[credit_position+1].record_number = -1;
+            saveSerialBlock(file, block_position, &block);
+        }
+
+         puts("Credit successfully added!");
+
+    }
+
+}
+
+
+int addNewCreditSequential(TFile *file, Credit new_credit){
 
     int block_position = 0;
     int credit_position;
@@ -398,6 +471,87 @@ int addNewCredit(TFile *file, Credit new_credit){
 
 }
 
+void loadData(){
+
+    TFile txtFile;
+    char max_lenght[100];
+
+    Credit credits[MAX_CREDITS];
+
+    txtFile.file = fopen("podaci.txt", "r");
+    puts("1");
+    int count = 0;
+
+    int *record_number;
+    char *name;
+    char *date;
+    int *loan_amount;
+    int *interest;
+    int *installments;
+    char *status;
+
+    if(txtFile.file != NULL){
+
+        while((fgets(max_lenght, 100, txtFile.file)) != NULL){
+
+            record_number = atoi(strtok(max_lenght, ","));
+            //printf("i:%d\n", i);
+            name = strtok(NULL, ",");
+            date = strtok(NULL, ",");
+            loan_amount = atoi(strtok(NULL, ","));
+            interest = atoi(strtok(NULL, ","));
+            installments = atoi(strtok(NULL, ","));
+            status = strtok(NULL, ",");
+
+            credits[count].record_number = record_number;
+            strcpy(credits[count].name, name);
+            credits[count].date = date;
+            credits[count].loan_amount = loan_amount;
+            credits[count].interest = interest;
+            credits[count].installments = installments;
+            credits[count].status = *status;
+
+            //printf("name %s\n", status);
+
+            count++;
+
+        }
+
+    }
+
+    fclose(txtFile.file);
+
+    TFile serial;
+    printf("Unesite naziv serijske datoteke: ");
+    scanf("%s", serial.fileName);
+    serial.file = fopen(serial.fileName, "wb+");
+
+    SerialBlock block;
+    block.credits[0].record_number = -1;
+
+    saveSerialBlock(&serial, 0, &block);
+
+    fclose(serial.file);
+
+    serial.file = fopen(serial.fileName, "rb+");
+
+
+    int i;
+    for(i = 0; i < count; i++){
+        printCredit(credits[i]);
+        addNewCreditSerial(&serial, credits[i]);
+    }
+
+    puts("Serijska datoteka je formirana!");
+
+
+
+
+    fclose(serial.file);
+
+
+
+}
 
 // ====================== PRINT ================================= //
 
@@ -405,11 +559,11 @@ void printCredit(Credit credit){
 
     puts("-------------------------------------------------------");
     printf("Record Number: %d\n", credit.record_number);
-    printf("Name: %s\n", credit.name);
-    printf("Date: %s\n", credit.date);
+    //printf("Name: %s\n", credit.name);
+    //printf("Date: %s\n", credit.date);
     printf("Loan Amount: %d\n", credit.loan_amount);
-    printf("Loan Interest: %d\n", credit.interest);
-    printf("Number of Installments: %d\n", credit.installments);
+    //printf("Loan Interest: %d\n", credit.interest);
+    //printf("Number of Installments: %d\n", credit.installments);
     printf("Status: %c\n", credit.status);
     puts("-------------------------------------------------------");
 
@@ -418,13 +572,13 @@ void printCredit(Credit credit){
 void printOverflow(Overflow overflow){
 
     printf("Record Number: %d\n", overflow.credit.record_number);
-    printf("Name: %s\n", overflow.credit.name);
-    printf("Date: %s\n", overflow.credit.date);
+    //printf("Name: %s\n", overflow.credit.name);
+    //printf("Date: %s\n", overflow.credit.date);
     printf("Loan Amount: %d\n", overflow.credit.loan_amount);
-    printf("Loan Interest: %d\n", overflow.credit.interest);
-    printf("Number of Installments: %d\n", overflow.credit.installments);
-    printf("File position: %d\n", overflow.filePosition);
-    printf("Next position: %d\n", overflow.nextOverflowPosition);
+    //printf("Loan Interest: %d\n", overflow.credit.interest);
+    //printf("Number of Installments: %d\n", overflow.credit.installments);
+    //printf("File position: %d\n", overflow.filePosition);
+    //printf("Next position: %d\n", overflow.nextOverflowPosition);
     printf("Status: %c\n", overflow.credit.status);
 
 
@@ -432,10 +586,40 @@ void printOverflow(Overflow overflow){
 
 }
 
+int printSerial(TFile *file){
+
+    if(file->file == NULL || strcmp(file->fileName,"serial") != 0 ){
+        puts("First choose serial file!");
+        return 99;
+    }
+
+    int block_position = 0;
+    int i;
+
+    SerialBlock block;
+
+    while(true){
+
+        readSerialBlock(file, block_position, &block);
+
+        for(i=0; i < serial_factorB; i++){
+
+            if(block.credits[i].record_number == -1)
+                return 0;
+
+            puts("-------------------------------------------------------");
+            printf("Block position: %d, credit position: %d\n", block_position+1, i+1);
+            printCredit(block.credits[i]);
+        }
+
+        block_position++;
+    }
+}
+
 int printAllCredits(TFile *file){
 
-    if(file->file == NULL){
-        puts("First choose file!");
+    if(file->file == NULL || strcmp(file->fileName,"seq") != 0){
+        puts("First choose sequential file!");
         return 99;
     }
 
@@ -489,13 +673,13 @@ int loadSerialAndMakeSequential(TFile *file){
     int status = 0;
     int i;
 
-    Block block;
+    SerialBlock block;
 
     while(status == 0){
 
-        readBlock(file, block_position, &block);
+        readSerialBlock(file, block_position, &block);
 
-        for(i=0; i < factorB; i++){
+        for(i=0; i < serial_factorB; i++){
 
             if(block.credits[i].record_number == -1){
                 status = 1;
@@ -527,7 +711,7 @@ int loadSerialAndMakeSequential(TFile *file){
     saveBlock(&new_file, 0, &init_block);
 
     for(i=0; i<credits_count; i++){
-        addNewCredit(&new_file, credits[i]);
+        addNewCreditSequential(&new_file, credits[i]);
     }
 
     fclose(new_file.file);
@@ -572,7 +756,7 @@ int printPrimaryZone(TFile *file){
 
         // print overflow zone
 
-        puts("-------------------------------------------------------");
+        //puts("-------------------------------------------------------");
         puts("--------------------OVERFLOW --------------------------");
         puts("-------------------------------------------------------");
 
@@ -599,7 +783,6 @@ int printPrimaryZone(TFile *file){
 }
 
 // ===================== Index-Sequential ========================= //
-
 
 void createIndexZone(char *fileName, TreeNode **root){
 
@@ -689,8 +872,6 @@ void createIndexZone(char *fileName, TreeNode **root){
 
     fclose(pzFile.file);
 
-
-
     int n = block_pos;
 
     int filePosition = 0;
@@ -703,17 +884,17 @@ void createIndexZone(char *fileName, TreeNode **root){
         saveTreeNode(&nodeFile, i, &nodes[i]);
     }
 
-    puts("11");
+
     TreeNode *p;
     p = bst(nodes, 0, n-1);
-    puts("12");
+
     *root = p;
 
     TreeNode end;
     end.block_address = -1;
     end.file_position = -1;
     end.key = -1;
-    puts("13");
+
     saveTreeNode(&nodeFile, block_pos, &end); // add end
 
     fclose(nodeFile.file);
@@ -836,11 +1017,7 @@ int createPrimaryZoneOverflowIndexZone(TFile *file, TreeNode **root){
 
     fclose(over_file.file);
 
-    // create index zone
-    printf("Unesite naziv zone indeksa: ");
-    char fileName[FILENAME_MAX];
-    scanf("%s", fileName);
-    createIndexZone(fileName, root);
+    createIndexZone("primary_zone", root);
 
 
 }
@@ -1634,6 +1811,7 @@ int main()
         printf("11. Logical Delete from Primary Zone\n");
         printf("12. Reorganization\n");
         printf("13. Average credit amount\n");
+        printf("14. Print serial file\n");
         printf("0. Exit\n");
         printf("\n===================\n");
 
@@ -1678,6 +1856,10 @@ int main()
             case 12: reorganization(&file, &root); break;
 
             case 13: averageCredit(&file); break;
+
+            case 14: printSerial(&file); break;
+
+            case 15: loadData(); break;
 
             case 0: exit(EXIT_FAILURE);
         }
