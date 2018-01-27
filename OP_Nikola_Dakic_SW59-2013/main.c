@@ -373,6 +373,38 @@ int searchSerial(TFile *file, int key, int *blockPos, int *creditPos){
 
 }
 
+int searchSequential(TFile *file, int key, int *blockPos, int *creditPos){
+
+    int block_position = 0;
+
+    Block block;
+    int i;
+
+    // find end position
+    while(true){
+
+        readBlock(file, block_position, &block);
+
+        for(i=0; i < factorB; i++){
+
+            //end
+            if(block.credits[i].record_number == -1){
+                *blockPos = block_position;
+                *creditPos = i;
+                return 0;
+            }
+
+            if(block.credits[i].record_number == key){
+                *blockPos = block_position;
+                *creditPos = i;
+                return 1;
+            }
+        }
+        block_position++;
+    }
+
+}
+
 int callAddNewCredit(TFile *file){
 
     if(file->file == NULL){
@@ -435,13 +467,14 @@ int addNewCreditSerial(TFile *file, Credit new_credit){
 
 }
 
-
 int addNewCreditSequential(TFile *file, Credit new_credit){
 
     int block_position = 0;
     int credit_position;
 
-    int status = searchSerial(file, new_credit.record_number, &block_position, &credit_position);
+    int status = searchSequential(file, new_credit.record_number, &block_position, &credit_position);
+
+     printf("status: %d, blockPos: %d, creditPos: %d\n", status, block_position, credit_position);
 
     if(status == 1){
         puts("Credit with that record number already exist!");
@@ -451,6 +484,8 @@ int addNewCreditSequential(TFile *file, Credit new_credit){
     if(status == 0){
 
         Block block;
+        //printf("debug:%d\n", block_position);
+        //printf("status:%d\n", status);
         readBlock(file, block_position, &block);
         block.credits[credit_position] = new_credit;
 
@@ -694,6 +729,12 @@ int loadSerialAndMakeSequential(TFile *file){
     }
 
     qsort(credits, credits_count, sizeof(Credit), compare);
+
+    for(i=0; i < credits_count; i++){
+
+        printCredit(credits[i]);
+
+    }
 
 
     // create seq file
@@ -1473,7 +1514,6 @@ int addNewCreditInPrimaryZone(TFile *file, TreeNode *root, Credit newCredit){
 
     return 123;
 }
-
 
 int searchUsingIndexAndPrimaryZone(TreeNode *root){
 
