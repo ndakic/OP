@@ -6,3 +6,5 @@ Data Organization
 - YAML
 - Serial file organization
 - Sequential file organization
+
+- Index-Sequential file organization
