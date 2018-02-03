@@ -10,6 +10,8 @@
 
 #define FILETYPE 15
 
+#define interest_percentage 20
+
 #define true 1
 #define false 0
 
@@ -22,14 +24,13 @@ typedef struct{
 
     int record_number; // 6 digits, record_number > 000000
     char name[50];
-    char date;
+    char date[50];
     int loan_amount;  // max 100 000
     int interest;     // max 20
     int installments; // max 72
     char status;      // a - active, i - inactive
 
 }Credit;
-
 
 typedef struct{
     Credit credits[serial_factorB];
@@ -53,7 +54,6 @@ typedef struct{
 }PZBlock;
 
                         // SAVE-READ
-
 // ==========================================================
 
 void saveSerialBlock(TFile *file, int blockPosition, SerialBlock *block){
@@ -285,7 +285,7 @@ void readTreeNode(TFile *file, int nodePosition, TreeNode *treeNode){
 
 }
 
-// ================ Serial and Sequential ====================== //
+// ==================== Serial and Sequential ====================== //
 
 void createFile(){
 
@@ -418,19 +418,49 @@ int callAddNewCredit(TFile *file){
 
     printf("Enter record number: ");
     int key;
-    scanf("%d", &key);
+    scanf(" %d", &key);
 
-    if(key < 0 || key > 999999){
-        puts("Key must be between 1 and 999999");
+    if(key/1000000 != 0 || key % 1000000/100000 == 0){
+        puts("Key must be between 100000 and 999999");
         return 99;
     }
 
     Credit credit;
     credit.record_number = key;
     credit.status = 'a';
+    credit.interest = interest_percentage;
+
+    printf("Enter Full Name: ");
+    scanf(" %50[^\n]", credit.name);
+
+    if(strlen(credit.name) > 50){
+        puts("Name length can't be bigger than 50.");
+        return 0;
+    }
 
     printf("Loan amount: ");
     scanf("%d", &credit.loan_amount);
+
+    if(credit.loan_amount < 0 || credit.loan_amount > 100000){
+        puts("Credit amount must be between 0 and 100000");
+        return 0;
+    }
+
+    printf("Loan approval date: (dd.mm.yyyy) ");
+    scanf("%s", credit.date);
+
+    if(strlen(credit.date) > 11){
+        puts("Wrong date format!");
+        return 0;
+    }
+
+    printf("Number of Installments: max(72) ");
+    scanf("%d", &credit.installments);
+
+    if(credit.installments < 0 || credit.installments > 72){
+        puts("Credit number of installments must be between 0 and 72");
+        return 0;
+    }
 
     addNewCreditSerial(file, credit);
 
@@ -453,6 +483,11 @@ int addNewCreditSerial(TFile *file, Credit new_credit){
         SerialBlock block;
         readSerialBlock(file, block_position, &block);
         block.credits[credit_position] = new_credit;
+
+        if(strcmp(block.fileType, "serial") != 0){
+            puts("This is Sequential file! Choose Serial file!");
+            return 0;
+        }
 
         if(credit_position == serial_factorB-1){
             saveSerialBlock(file, block_position, &block);
@@ -562,7 +597,7 @@ int loadData(){
 
             credits[count].record_number = record_number;
             strcpy(credits[count].name, name);
-            credits[count].date = date;
+            strcpy(credits[count].date, date);
             credits[count].loan_amount = loan_amount;
             credits[count].interest = interest;
             credits[count].installments = installments;
@@ -593,7 +628,7 @@ int loadData(){
 
     int i;
     for(i = 0; i < count; i++){
-        //printCredit(credits[i]);
+        printCredit(credits[i]);
         addNewCreditSerial(&serial, credits[i]);
     }
 
@@ -604,17 +639,17 @@ int loadData(){
     return 1;
 }
 
-// ====================== PRINT ================================= //
+// ======================== PRINT ================================== //
 
 void printCredit(Credit credit){
 
     puts("-------------------------------------------------------");
     printf("Record Number: %d\n", credit.record_number);
-    //printf("Name: %s\n", credit.name);
-    //printf("Date: %s\n", credit.date);
+    printf("Name: %s\n", credit.name);
+    printf("Date: %s\n", credit.date);
     printf("Loan Amount: %d\n", credit.loan_amount);
-    //printf("Loan Interest: %d\n", credit.interest);
-    //printf("Number of Installments: %d\n", credit.installments);
+    printf("Loan Interest: %d %\n", credit.interest);
+    printf("Number of Installments: %d\n", credit.installments);
     printf("Status: %c\n", credit.status);
     puts("-------------------------------------------------------");
 
@@ -623,11 +658,11 @@ void printCredit(Credit credit){
 void printOverflow(Overflow overflow){
 
     printf("Record Number: %d\n", overflow.credit.record_number);
-    //printf("Name: %s\n", overflow.credit.name);
-    //printf("Date: %s\n", overflow.credit.date);
+    printf("Name: %s\n", overflow.credit.name);
+    printf("Date: %s\n", overflow.credit.date);
     printf("Loan Amount: %d\n", overflow.credit.loan_amount);
-    //printf("Loan Interest: %d\n", overflow.credit.interest);
-    //printf("Number of Installments: %d\n", overflow.credit.installments);
+    printf("Loan Interest: %d\n", overflow.credit.interest);
+    printf("Number of Installments: %d\n", overflow.credit.installments);
     //printf("File position: %d\n", overflow.filePosition);
     //printf("Next position: %d\n", overflow.nextOverflowPosition);
     printf("Status: %c\n", overflow.credit.status);
@@ -1974,6 +2009,59 @@ int averageCredit(TFile *file){
     printf("Average: %d\n", total / n);
 }
 
+int newCreditInput(Credit *newCredit){
+
+    printf("Enter record number: ");
+    int key;
+    scanf(" %d", &key);
+
+    if(key/1000000 != 0 || key % 1000000/100000 == 0){
+        puts("Key must be between 100000 and 999999");
+        return 99;
+    }
+
+    Credit credit;
+    credit.record_number = key;
+    credit.status = 'a';
+    credit.interest = interest_percentage;
+
+    printf("Enter Full Name: ");
+    scanf(" %50[^\n]", credit.name);
+
+    if(strlen(credit.name) > 50){
+        puts("Name length can't be bigger than 50.");
+        return 0;
+    }
+
+    printf("Loan amount: ");
+    scanf("%d", &credit.loan_amount);
+
+    if(credit.loan_amount < 0 || credit.loan_amount > 100000){
+        puts("Credit amount must be between 0 and 100000");
+        return 0;
+    }
+
+    printf("Loan approval date: (dd.mm.yyyy) ");
+    scanf("%s", credit.date);
+
+    if(strlen(credit.date) > 11){
+        puts("Wrong date format!");
+        return 0;
+    }
+
+    printf("Number of Installments: max(72) ");
+    scanf("%d", &credit.installments);
+
+    if(credit.installments < 0 || credit.installments > 72){
+        puts("Credit number of installments must be between 0 and 72");
+        return 0;
+    }
+
+    *newCredit = credit;
+
+    return 1;
+}
+
 
 int main()
 {
@@ -1996,7 +2084,7 @@ int main()
         printf("2. Create a file\n");
         printf("3. Choose a file\n");
         printf("4. Print active file\n");
-        printf("5. Add new Credit\n");
+        printf("5. Add new Credit(Serial)\n");
         printf("6. Print Credits (serial)\n");
         printf("7. Print Credits (sequential)\n");
         printf("8. Create Sequential file\n");
@@ -2037,24 +2125,27 @@ int main()
             case 10: printPrimaryZone(&file); break;
 
             case 11:
-                    printf("Enter credit id: ");
-                    scanf("%d", &newCredit.record_number);
 
-                    printf("Loan amount: ");
-                    scanf("%d", &newCredit.loan_amount);
+                    newCreditInput(&newCredit);
 
                     loadTree(&root);
 
-                    addNewCreditInPrimaryZone(&file, root, newCredit);
+                    int status = addNewCreditInPrimaryZone(&file, root, newCredit);
+                    if(status == 1){
+                        puts("============================");
+                        puts("Credit successfully added!");
+                        puts("============================");
+                    }
+
                     break;
 
             case 12:
-                loadTree(&root);
-                searchUsingIndexAndPrimaryZone(root); break;
+                    loadTree(&root);
+                    searchUsingIndexAndPrimaryZone(root); break;
 
             case 13:
-                loadTree(&root);
-                logicalDeleteCredit(&file, root); break;
+                    loadTree(&root);
+                    logicalDeleteCredit(&file, root); break;
 
             case 14: reorganization(&file, &root);
                      createIndexZone(file.fileName, &root);
