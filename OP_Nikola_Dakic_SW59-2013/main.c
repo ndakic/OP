@@ -8,6 +8,8 @@
 #define FILENAME_MAX 30
 #define MAX_CREDITS 40
 
+#define FILETYPE 15
+
 #define true 1
 #define false 0
 
@@ -31,10 +33,12 @@ typedef struct{
 
 typedef struct{
     Credit credits[serial_factorB];
+    char fileType[FILETYPE];
 }SerialBlock;
 
 typedef struct{
     Credit credits[factorB];
+    char fileType[FILETYPE];
 }Block;
 
 typedef struct{
@@ -53,6 +57,8 @@ typedef struct{
 // ==========================================================
 
 void saveSerialBlock(TFile *file, int blockPosition, SerialBlock *block){
+
+    strcpy(block->fileType, "serial");
 
     int status;
 
@@ -80,6 +86,8 @@ void readSerialBlock(TFile *file, int blockPosition, SerialBlock *block){
 }
 
 void saveBlock(TFile *file, int blockPosition, Block *block){
+
+    strcpy(block->fileType, "sequential");
 
     int status;
 
@@ -118,7 +126,7 @@ void savePZBlock(TFile *file, int blockPosition, PZBlock *pz_block){
     if(status != 1)
         puts("Write PZBlock Error!");
 
-    printf("Block saved at position: %d\n", blockPosition);
+    //printf("Block saved at position: %d\n", blockPosition);
 
 }
 
@@ -171,8 +179,7 @@ void saveOverflow(int overflowPosition, Overflow *overflow){
 
     fclose(file.file);
 
-
-    printf("Overflow saved at position : %d\n", overflowPosition);
+    //printf("Overflow saved at position : %d\n", overflowPosition);
 
 }
 
@@ -223,7 +230,6 @@ TreeNode* bst(TreeNode nodes[20], int first, int last){
 }
 
 TreeNode* searchTree(int key, TreeNode *temp, int *block){
-
     TreeNode *empty = (TreeNode*)malloc(sizeof(TreeNode));
 
     if(temp != NULL){
@@ -307,20 +313,15 @@ void chooseFile(TFile *file, TreeNode **root){
     printf("Enter filename: ");
     scanf("%s", file->fileName);
 
-    // load balanced binary tree
-    if(strcmp(file->fileName, "primary_zone") == 0 || strcmp(file->fileName, "reorg") == 0 ){
-
-        createIndexZone(file->fileName, root);
-
-    }
-
     file->file = fopen(file->fileName, "rb+");
 
     if(file->file == NULL){
         printf("There is no file with %s name!\n", file->fileName);
+        return 0;
     }else{
         puts("File is now active!");
     }
+
 }
 
 void printActiveFile(TFile *file){
@@ -519,14 +520,23 @@ int addNewCreditSequential(TFile *file, Credit new_credit){
 
 }
 
-void loadData(){
+int loadData(){
 
     TFile txtFile;
     char max_lenght[100];
 
     Credit credits[MAX_CREDITS];
 
-    txtFile.file = fopen("podaci.txt", "r");
+    printf("Enter filename: ");
+    scanf("%s", txtFile.fileName);
+
+    txtFile.file = fopen(txtFile.fileName, "r");
+
+    if(txtFile.file == NULL){
+        puts("File with that name does not exist!");
+        return 0;
+    }
+
     int count = 0;
 
     int *record_number;
@@ -567,7 +577,7 @@ void loadData(){
     fclose(txtFile.file);
 
     TFile serial;
-    printf("Enter new filename: ");
+    printf("Enter new serial filename: ");
     scanf("%s", serial.fileName);
     serial.file = fopen(serial.fileName, "wb+");
 
@@ -583,7 +593,7 @@ void loadData(){
 
     int i;
     for(i = 0; i < count; i++){
-        printCredit(credits[i]);
+        //printCredit(credits[i]);
         addNewCreditSerial(&serial, credits[i]);
     }
 
@@ -591,6 +601,7 @@ void loadData(){
 
     fclose(serial.file);
 
+    return 1;
 }
 
 // ====================== PRINT ================================= //
@@ -628,7 +639,7 @@ void printOverflow(Overflow overflow){
 
 int printSerial(TFile *file){
 
-    if(file->file == NULL || strcmp(file->fileName,"serial") != 0 ){
+    if(file->file == NULL){
         puts("First choose serial file!");
         return 99;
     }
@@ -641,6 +652,11 @@ int printSerial(TFile *file){
     while(true){
 
         readSerialBlock(file, block_position, &block);
+
+        if(strcmp(block.fileType, "serial") != 0){
+            puts("This is Sequential file! Choose Serial file!");
+            return 0;
+        }
 
         for(i=0; i < serial_factorB; i++){
 
@@ -658,7 +674,7 @@ int printSerial(TFile *file){
 
 int printAllCredits(TFile *file){
 
-    if(file->file == NULL || strcmp(file->fileName,"seq") != 0){
+    if(file->file == NULL){
         puts("First choose sequential file!");
         return 99;
     }
@@ -671,6 +687,11 @@ int printAllCredits(TFile *file){
     while(true){
 
         readBlock(file, block_position, &block);
+
+        if(strcmp(block.fileType, "sequential") != 0){
+            puts("This is serial file! Choose Sequential file!");
+            return 0;
+        }
 
         for(i=0; i < factorB; i++){
 
@@ -719,6 +740,11 @@ int loadSerialAndMakeSequential(TFile *file){
 
         readSerialBlock(file, block_position, &block);
 
+        if(strcmp(block.fileType, "serial") != 0){
+            puts("This is Sequential file! Choose Serial file!");
+            return 0;
+        }
+
         for(i=0; i < serial_factorB; i++){
 
             if(block.credits[i].record_number == -1){
@@ -763,6 +789,11 @@ int loadSerialAndMakeSequential(TFile *file){
 }
 
 int printPrimaryZone(TFile *file){
+
+    if(file->file == NULL || strcmp(file->fileName, "primary_zone") != 0){
+        puts("Primary zone is not selected!");
+        return 0;
+    }
 
     int pz_block_position = 0;
     int i;
@@ -895,6 +926,8 @@ void createIndexZone(char *fileName, TreeNode **root){
 
     fclose(pzFile.file);
 
+    puts("Primary zone is created with name: primary_zone");
+
     int n = block_pos;
 
     int filePosition = 0;
@@ -903,7 +936,7 @@ void createIndexZone(char *fileName, TreeNode **root){
     nodeFile.file = fopen("treeNodes", "wb+");
 
     for(i=0; i < block_pos; i++){
-        printf("Max element of block: %d is %d\n", nodes[i].block_address, nodes[i].key);
+        //printf("Max element of block: %d is %d\n", nodes[i].block_address, nodes[i].key);
         saveTreeNode(&nodeFile, i, &nodes[i]);
     }
 
@@ -920,6 +953,57 @@ void createIndexZone(char *fileName, TreeNode **root){
     saveTreeNode(&nodeFile, block_pos, &end); // add end
 
     fclose(nodeFile.file);
+
+    puts("Index zone is created with name: treeNodes");
+
+}
+
+int loadTree(TreeNode **root){
+
+    TFile file;
+    file.file = fopen("treeNodes", "rb+");
+
+    if(file.file == NULL){
+        puts("Tree does not exist!");
+        return 0;
+    }
+
+    TreeNode nodes[50];
+
+    TreeNode node;
+    node.file_position = -1;
+
+    int i;
+    int status = 0;
+    int nodePosition = 0;
+
+    while(status == 0){
+
+        readTreeNode(&file, nodePosition, &node);
+
+        if(node.file_position == -1){
+
+            nodes[nodePosition] = node;
+            status = 1;
+            break;
+        }
+
+        nodes[nodePosition] = node;
+
+        //printf("node: %d\n", node.key);
+
+        nodePosition++;
+
+    }
+
+    TreeNode *p;
+    p = bst(nodes, 0, nodePosition-1);
+
+    *root = p;
+
+    fclose(file.file);
+
+    return 1;
 
 }
 
@@ -944,6 +1028,11 @@ int createPrimaryZoneOverflowIndexZone(TFile *file, TreeNode **root){
     while(status == 0){
 
         readBlock(file, block_position, &block);
+
+        if(strcmp(block.fileType, "sequential") != 0){
+            puts("This is serial file! Choose Sequential file!");
+            return 0;
+        }
 
         for(i=0; i < factorB; i++){
 
@@ -1015,7 +1104,6 @@ int createPrimaryZoneOverflowIndexZone(TFile *file, TreeNode **root){
 
     fclose(pz_file.file);
 
-
     // create overflow zone with end
 
     Overflow overflow;
@@ -1036,8 +1124,9 @@ int createPrimaryZoneOverflowIndexZone(TFile *file, TreeNode **root){
     if(over_status != 1)
         puts("Write Error!");
 
-
     fclose(over_file.file);
+
+    puts("Overflow zone is created with name overflows");
 
     createIndexZone("primary_zone", root);
 
@@ -1068,7 +1157,6 @@ int searchCreditPosition(TFile *file, TreeNode *root, int key, int *blockPositio
 
                 return 1;
             }
-
 
             // check overflow zone
 
@@ -1282,6 +1370,11 @@ int getCreditPosition(TFile *file, int *blockPos, int *creditPos){
 }
 
 int addNewCreditInPrimaryZone(TFile *file, TreeNode *root, Credit newCredit){
+
+    if(file->file == NULL || strcmp(file->fileName, "primary_zone") != 0){
+        puts("Primary zone is not selected!");
+        return 0;
+    }
 
     int block_pos;
     int credit_pos;
@@ -1541,6 +1634,11 @@ int addNewCreditInPrimaryZone(TFile *file, TreeNode *root, Credit newCredit){
 
 int searchUsingIndexAndPrimaryZone(TreeNode *root){
 
+    if(root == NULL){
+        puts("Root is not Loaded!");
+        return 0;
+    }
+
     printf("Enter key:");
     int key;
     scanf("%d", &key);
@@ -1610,6 +1708,11 @@ int searchUsingIndexAndPrimaryZone(TreeNode *root){
 
 int logicalDeleteCredit(TFile *file, TreeNode *root){
 
+    if(file->file == NULL || strcmp(file->fileName, "primary_zone")){
+        puts("Primary zone is not selected!");
+        return 0;
+    }
+
     printf("Enter key: ");
     int key;
 
@@ -1666,6 +1769,11 @@ int logicalDeleteCredit(TFile *file, TreeNode *root){
 }
 
 int reorganization(TFile *file, TreeNode **root){
+
+    if(file->file == NULL || strcmp(file->fileName, "primary_zone")){
+        puts("Primary zone is not selected!");
+        return 0;
+    }
 
     int block_count = 0;
     int credit_count = 0;
@@ -1742,10 +1850,9 @@ int reorganization(TFile *file, TreeNode **root){
     qsort(activeCredits, cnt, sizeof(Credit), compare);
 
     TFile new_file;
-    printf("Enter new filename:");
-    scanf("%s", new_file.fileName);
+    char fileName[20] = "primary_zone";
 
-    new_file.file = fopen(new_file.fileName, "wb+");
+    new_file.file = fopen(fileName, "wb+");
 
     PZBlock block;
     block.credits[0].record_number = -1;
@@ -1758,7 +1865,7 @@ int reorganization(TFile *file, TreeNode **root){
 
     fclose(new_file.file);
 
-    new_file.file = fopen(new_file.fileName, "rb+");
+    new_file.file = fopen(fileName, "rb+");
 
     *root = NULL;
 
@@ -1801,13 +1908,19 @@ int reorganization(TFile *file, TreeNode **root){
     puts("Reorganization is successfully completed!");
 
     fclose(new_file.file);
-    createIndexZone(new_file.fileName, root);
+
+    file->file = fopen(fileName, "rb+");
 
     return 1;
 
 }
 
 int averageCredit(TFile *file){
+
+    if(file->file == NULL || strcmp(file->fileName, "primary_zone")){
+        puts("Primary zone is not selected!");
+        return 0;
+    }
 
     int block_count = 0;
 
@@ -1930,15 +2043,18 @@ int main()
                     printf("Loan amount: ");
                     scanf("%d", &newCredit.loan_amount);
 
+                    loadTree(&root);
+
                     addNewCreditInPrimaryZone(&file, root, newCredit);
-                    fclose(file.file);
-                    createIndexZone(file.fileName, &root);
-                    file.file = fopen("primary_zone", "rb+");
                     break;
 
-            case 12: searchUsingIndexAndPrimaryZone(root); break;
+            case 12:
+                loadTree(&root);
+                searchUsingIndexAndPrimaryZone(root); break;
 
-            case 13: logicalDeleteCredit(&file, root); break;
+            case 13:
+                loadTree(&root);
+                logicalDeleteCredit(&file, root); break;
 
             case 14: reorganization(&file, &root);
                      createIndexZone(file.fileName, &root);
