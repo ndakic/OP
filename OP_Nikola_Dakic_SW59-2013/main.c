@@ -54,7 +54,7 @@ typedef struct{
 }PZBlock;
 
                         // SAVE-READ
-// ==========================================================
+// =============================================================
 
 void saveSerialBlock(TFile *file, int blockPosition, SerialBlock *block){
 
@@ -184,7 +184,7 @@ void saveOverflow(int overflowPosition, Overflow *overflow){
 }
 
                          // TREE
-// ==========================================================
+// ===============================================================
 
 struct Node{
     int key;
@@ -880,7 +880,7 @@ int printPrimaryZone(TFile *file){
 
 }
 
-// ===================== Index-Sequential ========================= //
+// ====================== Index-Sequential ========================= //
 
 void createIndexZone(char *fileName, TreeNode **root){
 
@@ -1491,7 +1491,7 @@ int addNewCreditInPrimaryZone(TFile *file, TreeNode *root, Credit newCredit){
 
         saveOverflow(position+2, &end);
 
-
+        return 1;
     }
 
 
@@ -1629,7 +1629,7 @@ int addNewCreditInPrimaryZone(TFile *file, TreeNode *root, Credit newCredit){
             if(temp.record_number == -1){
                 pz_block.credits[i+1] = temp;
                 savePZBlock(file, block_pos, &pz_block);
-                return 113;
+                return 1;
             }
 
             newCredit = temp;
@@ -1979,7 +1979,7 @@ int averageCredit(TFile *file){
                 break;
             }
 
-            if(pz_block.credits[i].loan_amount > 25000 && pz_block.credits[i].loan_amount < 75000){
+            if(pz_block.credits[i].loan_amount > 25000 && pz_block.credits[i].loan_amount < 75000 && pz_block.credits[i].status == 'a'){
                 printf("Credit: %d , amount: %d\n", pz_block.credits[i].record_number, pz_block.credits[i].loan_amount);
                 total += pz_block.credits[i].loan_amount;
                 n++;
@@ -1991,7 +1991,7 @@ int averageCredit(TFile *file){
 
                 while(overflow.nextOverflowPosition != -1){
 
-                    if(overflow.credit.loan_amount > 25000 && overflow.credit.loan_amount < 75000){
+                    if(overflow.credit.loan_amount > 25000 && overflow.credit.loan_amount < 75000 && pz_block.credits[i].status == 'a'){
 
                         printf("Overflow Credit: %d , amount: %d\n", overflow.credit.record_number, overflow.credit.loan_amount);
                         total += overflow.credit.loan_amount;
@@ -2072,7 +2072,7 @@ int main()
     TreeNode *root = NULL;
 
     int option = 99;
-
+    int status;
 
     Credit newCredit;
     newCredit.status = 'a';
@@ -2084,13 +2084,13 @@ int main()
         printf("2. Create a file\n");
         printf("3. Choose a file\n");
         printf("4. Print active file\n");
-        printf("5. Add new Credit(Serial)\n");
+        printf("5. Add new Credit(serial)\n");
         printf("6. Print Credits (serial)\n");
         printf("7. Print Credits (sequential)\n");
         printf("8. Create Sequential file\n");
         printf("9. Create Primary, Overflow and Index Zone\n");
         printf("10. Print Primary And Overflow Zone\n");
-        printf("11. Add New in Primary And Overflow Zone\n");
+        printf("11. Add New Credit in Primary And Overflow Zone\n");
         printf("12. Search Index Zone\n");
         printf("13. Logical Delete from Primary Zone\n");
         printf("14. Reorganization\n");
@@ -2147,8 +2147,9 @@ int main()
                     loadTree(&root);
                     logicalDeleteCredit(&file, root); break;
 
-            case 14: reorganization(&file, &root);
-                     createIndexZone(file.fileName, &root);
+            case 14: status = reorganization(&file, &root);
+                     if(status == 1)
+                        createIndexZone(file.fileName, &root);
                      break;
 
             case 15: averageCredit(&file); break;
