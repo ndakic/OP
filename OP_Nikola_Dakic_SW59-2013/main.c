@@ -221,6 +221,8 @@ TreeNode* bst(TreeNode nodes[20], int first, int last){
     mid = (first + last) / 2;
     temp = new(nodes[mid]);
 
+    printf("node: %d\n", temp->key);
+
 
     temp->left = bst(nodes, first, mid - 1);
     temp->right = bst(nodes, mid + 1, last);
@@ -235,6 +237,7 @@ TreeNode* searchTree(int key, TreeNode *temp, int *block){
     if(temp != NULL){
         if(temp->key > key || temp->key == key){
             *block = temp->block_address;
+            printf("node: %d\n", *block);
         }
     }
 
@@ -1208,7 +1211,7 @@ int searchCreditPosition(TFile *file, TreeNode *root, int key, int *blockPositio
                 }
 
                 //while next overflow exist
-                while(overflow.nextOverflowPosition != -1){
+                while(overflow.filePosition != -1){
 
                     if(overflow.credit.record_number == key){
                         *blockPosition = pz_block_position;
@@ -1218,7 +1221,7 @@ int searchCreditPosition(TFile *file, TreeNode *root, int key, int *blockPositio
                     }
 
                     // load next overflow
-                    if(overflow.nextOverflowPosition != -1){
+                    if(overflow.filePosition != -1){
                         Overflow next;
                         readOverflow(overflow.nextOverflowPosition, &next);
                         overflow = next;
@@ -1313,7 +1316,7 @@ int searchCreditNextPosition(TFile *file, TreeNode *root, int key, int *blockPos
 
 
                 // while next overflow exist
-                while(overflow.nextOverflowPosition != -1){
+                while(overflow.filePosition != -1){
 
                     if(overflow.credit.record_number == key && overflow.credit.status == 'a'){
                         *blockPosition = pz_block_position;
@@ -1330,7 +1333,7 @@ int searchCreditNextPosition(TFile *file, TreeNode *root, int key, int *blockPos
                     }
 
                     // load next overflow
-                    if(overflow.nextOverflowPosition != -1){
+                    if(overflow.filePosition != -1){
                         Overflow next;
                         readOverflow(overflow.nextOverflowPosition, &next);
                         overflow = next;
@@ -1416,9 +1419,9 @@ int addNewCreditInPrimaryZone(TFile *file, TreeNode *root, Credit newCredit){
 
     int status = searchCreditNextPosition(file, root, newCredit.record_number, &block_pos, &credit_pos);
 
-    //printf("status: %d\n", status);
-    //printf("block pos: %d\n", block_pos);
-    //printf("credi pos: %d\n", credit_pos);
+    printf("status: %d\n", status);
+    printf("block pos: %d\n", block_pos);
+    printf("credi pos: %d\n", credit_pos);
 
     if(status == 0){
         puts("Credit with that key already exist!");
@@ -1654,13 +1657,30 @@ int addNewCreditInPrimaryZone(TFile *file, TreeNode *root, Credit newCredit){
 
     // add new credit to inactive credit with same key in overflow zone
     if(status == 4){
-        Overflow over;
-        readOverflow(credit_pos, &over);
 
-        over.credit = newCredit;
-        saveOverflow(credit_pos, &over);
 
-        return 1;
+        if(credit_pos == 0){
+
+            PZBlock pz_blockk;
+            readPZBlock(file, block_pos, &pz_blockk);
+
+            pz_blockk.overflow.credit = newCredit;
+
+            savePZBlock(file, block_pos, &pz_blockk);
+
+            return 1;
+
+        }else{
+            Overflow over;
+            readOverflow(credit_pos, &over);
+
+            over.credit = newCredit;
+            saveOverflow(credit_pos, &over);
+
+            return 1;
+        }
+
+
     }
 
 
@@ -1758,6 +1778,8 @@ int logicalDeleteCredit(TFile *file, TreeNode *root){
 
     int status = searchCreditPosition(file, root, key, &blockPos, &creditPos);
 
+    printf("status: %d, block %d, creditPos %d\n", status, blockPos, creditPos);
+
     if(status == 99){
         puts("Credit with that key don't exist!");
         return 0;
@@ -1783,16 +1805,38 @@ int logicalDeleteCredit(TFile *file, TreeNode *root){
 
     if(status == 3){
 
-        Overflow over;
-        readOverflow(creditPos, &over);
+        if(creditPos == 0){
 
-        if(over.credit.status == 'i'){
-            puts("Credit is already inactive!");
-            return 11;
+            PZBlock block;
+
+            readPZBlock(file, blockPos, &block);
+
+            if(block.overflow.credit.status == 'i'){
+                puts("Credit is already inactive!");
+                return 1;
+            }
+
+            block.overflow.credit.status = 'i';
+
+            savePZBlock(file, blockPos, &block);
+
+
+        }else{
+
+            Overflow over;
+            readOverflow(creditPos, &over);
+
+            if(over.credit.status == 'i'){
+                puts("Credit is already inactive!");
+                return 11;
+            }
+
+            over.credit.status = 'i';
+            saveOverflow(creditPos, &over);
+
         }
 
-        over.credit.status = 'i';
-        saveOverflow(creditPos, &over);
+
 
     }
 
