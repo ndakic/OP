@@ -1,9 +1,11 @@
-# OP
-Data Organization
+## OP - Data Organization
 
+### Java:
 - CSV
 - JSON
 - YAML
+
+### C:
 - Serial file organization
 - Sequential file organization
 
